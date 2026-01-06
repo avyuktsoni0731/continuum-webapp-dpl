@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
 import { WaitlistConfirmationEmail } from "@/emails/waitlist-confirmation";
+import { addToWaitlist, checkEmailExists } from "@/lib/google-sheets";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -15,6 +16,18 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     }
+
+    // Check if email already exists in the waitlist
+    const emailExists = await checkEmailExists(email);
+    if (emailExists) {
+      return NextResponse.json(
+        { error: "This email is already on the waitlist!" },
+        { status: 400 }
+      );
+    }
+
+    // Add email to Google Sheets
+    await addToWaitlist(email);
 
     // Send confirmation email to the user
     const { data: confirmationData, error: confirmationError } =
