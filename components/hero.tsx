@@ -22,7 +22,7 @@ export function Hero() {
         >
           <Badge
             variant="outline"
-            className="px-4 py-1.5 border-accent/20 text-foreground bg-accent/5 rounded-full font-medium text-sm"
+            className="px-4 py-1.5 border-accent text-foreground bg-accent/5 rounded-full font-medium text-sm"
           >
             Now in Private Beta
           </Badge>
