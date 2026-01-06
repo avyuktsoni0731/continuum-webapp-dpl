@@ -38,29 +38,30 @@ export function Features() {
           </p>
         </motion.div>
 
-        <div className="grid md:grid-cols-12 gap-6 auto-rows-[240px]">
+        <div className="grid md:grid-cols-12 gap-6 md:auto-rows-[240px]">
           {/* Main Feature - Bento Style */}
           <motion.div
             initial={{ opacity: 0, y: 50 }}
             animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="md:col-span-8 md:row-span-2 rounded-3xl border border-border bg-card/50 overflow-hidden group relative p-10 flex flex-col justify-end"
+            className="md:col-span-8 md:row-span-2 rounded-3xl border border-border bg-card/50 overflow-hidden group relative p-6 md:p-10 flex flex-col md:justify-end gap-6 md:gap-0"
           >
-            <div className="absolute top-10 right-10 flex gap-4 opacity-50 grayscale group-hover:grayscale-0 transition-all duration-500">
-              <div className="w-16 h-16 rounded-2xl bg-[#202124] border border-border flex items-center justify-center p-3 shadow-xl transform group-hover:-translate-y-2 transition-transform">
+            {/* Icons - positioned differently on mobile vs desktop */}
+            <div className="flex gap-3 md:gap-4 md:absolute md:top-10 md:right-10 opacity-50 grayscale group-hover:grayscale-0 transition-all duration-500 justify-center md:justify-start">
+              <div className="w-12 h-12 md:w-16 md:h-16 rounded-xl md:rounded-2xl bg-[#202124] border border-border flex items-center justify-center p-2 md:p-3 shadow-xl transform group-hover:-translate-y-2 transition-transform">
                 <Github className="w-full h-full text-white" />
               </div>
-              <div className="w-16 h-16 rounded-2xl bg-[#0052CC] border border-border flex items-center justify-center p-3 shadow-xl transform group-hover:-translate-y-4 transition-transform delay-75">
+              <div className="w-12 h-12 md:w-16 md:h-16 rounded-xl md:rounded-2xl bg-[#0052CC] border border-border flex items-center justify-center p-2 md:p-3 shadow-xl transform group-hover:-translate-y-4 transition-transform delay-75">
                 <Database className="w-full h-full text-white" />
               </div>
-              <div className="w-16 h-16 rounded-2xl bg-[#EA4335] border border-border flex items-center justify-center p-3 shadow-xl transform group-hover:-translate-y-2 transition-transform delay-150">
+              <div className="w-12 h-12 md:w-16 md:h-16 rounded-xl md:rounded-2xl bg-[#EA4335] border border-border flex items-center justify-center p-2 md:p-3 shadow-xl transform group-hover:-translate-y-2 transition-transform delay-150">
                 <Calendar className="w-full h-full text-white" />
               </div>
             </div>
 
-            <div className="space-y-4 relative z-10">
-              <h3 className="text-4xl">Multi-Tool Synergy</h3>
-              <p className="text-muted-foreground text-lg max-w-md">
+            <div className="space-y-3 md:space-y-4 relative z-10">
+              <h3 className="text-3xl md:text-4xl">Multi-Tool Synergy</h3>
+              <p className="text-muted-foreground text-base md:text-lg max-w-md">
                 Ask about a Jira task, see the linked GitHub PR, and check your
                 availability for a review—all in a single Slack thread.
               </p>
