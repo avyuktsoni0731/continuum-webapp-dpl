@@ -22,7 +22,7 @@ export async function sendConfirmationEmail(email: string) {
 
     // Send confirmation email to user
     await transporter.sendMail({
-      from: `"Continuum" <${process.env.GMAIL_USER}>`,
+      from: `"Avyukt@Continuum" <${process.env.GMAIL_USER}>`,
       to: email,
       subject: "Welcome to the Continuum Waitlist! 🎉",
       html: emailHtml,
