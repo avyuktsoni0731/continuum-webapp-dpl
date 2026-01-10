@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Geist, Fraunces } from "next/font/google";
 import "./globals.css";
 import { SmoothScrollProvider } from "@/components/smooth-scroll-provider";
+import { GoogleAnalytics } from "@/components/google-analytics";
 
 const geist = Geist({
   subsets: ["latin"],
@@ -29,6 +30,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${geist.variable} ${fraunces.variable} dark`}>
       <body className="font-sans antialiased bg-background text-foreground">
+        <GoogleAnalytics />
         <SmoothScrollProvider>{children}</SmoothScrollProvider>
       </body>
     </html>
