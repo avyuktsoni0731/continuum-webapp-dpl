@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { ArrowRight } from "lucide-react";
+import { trackWaitlistSignup } from "@/lib/analytics";
 
 export function WaitlistForm() {
   const [email, setEmail] = useState("");
@@ -30,6 +31,9 @@ export function WaitlistForm() {
       if (!response.ok) {
         throw new Error(data.error || "Failed to join waitlist");
       }
+
+      // Track successful signup
+      trackWaitlistSignup(email);
 
       toast.success(
         "🎉 You're on the list! Check your email for confirmation."
