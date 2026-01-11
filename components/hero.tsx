@@ -44,8 +44,9 @@ export function Hero() {
           transition={{ duration: 0.6, delay: 0.5 }}
           className="max-w-xl mx-auto text-lg md:text-xl text-muted-foreground leading-relaxed text-pretty"
         >
-          Stop context switching between Jira, GitHub, and Calendar. Continuum
-          orchestrates your tools through natural language in Slack.
+          Stop context switching between your tools. Continuum orchestrates the
+          platforms your team already uses through natural language in Slack—with
+          smart delegation, always-on context, and intelligent automation.
         </motion.p>
 
         <motion.div
