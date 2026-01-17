@@ -47,12 +47,12 @@ export function Navbar() {
             >
               Integrations
             </button>
-            <button
-              onClick={() => scrollToSection("get-started")}
+            <Link
+              href="/install"
               className="hover:text-foreground transition-colors"
             >
-              Get Started
-            </button>
+              Install
+            </Link>
           </div>
         </div>
         <Button
