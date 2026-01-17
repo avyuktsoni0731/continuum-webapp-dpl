@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { motion } from "framer-motion";
@@ -17,6 +18,18 @@ export function BetaAccessGate({ children, onAccessGranted }: BetaAccessGateProp
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [granted, setGranted] = useState(false);
+
+  // Check if already granted in this session (useEffect to avoid render issues)
+  useEffect(() => {
+    if (typeof window !== "undefined" && !granted) {
+      const alreadyGranted = sessionStorage.getItem("beta_access_granted") === "true";
+      if (alreadyGranted) {
+        setGranted(true);
+        onAccessGranted();
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Only run once on mount
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,21 +53,40 @@ export function BetaAccessGate({ children, onAccessGranted }: BetaAccessGateProp
     }, 300);
   };
 
-  // Check if already granted in this session
-  if (typeof window !== "undefined") {
-    const alreadyGranted = sessionStorage.getItem("beta_access_granted") === "true";
-    if (alreadyGranted && !granted) {
-      setGranted(true);
-      onAccessGranted();
-    }
-  }
-
   if (granted) {
     return <>{children}</>;
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 bg-background">
+    <div className="min-h-screen flex items-center justify-center px-4 bg-background relative">
+      {/* Navbar */}
+      <motion.header
+        initial={{ y: -100, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+        className="fixed top-6 left-1/2 -translate-x-1/2 z-50 w-[90%] max-w-2xl"
+      >
+        <nav className="flex items-center justify-between px-6 py-2 bg-card/50 backdrop-blur-xl border border-border rounded-full shadow-2xl shadow-black/50">
+          <Link
+            href="/"
+            className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+          >
+            <span className="font-serif text-lg font-bold tracking-tight">
+              Continuum
+            </span>
+          </Link>
+          <Link href="/#waitlist">
+            <Button
+              variant="outline"
+              size="sm"
+              className="rounded-full bg-foreground text-background hover:bg-foreground/90 transition-all border-none font-medium"
+            >
+              Join Waitlist
+            </Button>
+          </Link>
+        </nav>
+      </motion.header>
+
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

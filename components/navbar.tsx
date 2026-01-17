@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 
@@ -15,6 +16,9 @@ const scrollToSection = (id: string) => {
 };
 
 export function Navbar() {
+  const pathname = usePathname();
+  const isInstallPage = pathname === "/install";
+
   return (
     <motion.header
       initial={{ y: -100, opacity: 0 }}
@@ -24,45 +28,88 @@ export function Navbar() {
     >
       <nav className="flex items-center justify-between px-6 py-2 bg-card/50 backdrop-blur-xl border border-border rounded-full shadow-2xl shadow-black/50">
         <div className="flex items-center gap-8">
-          <button
-            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-            className="flex items-center gap-2"
+          <Link
+            href="/"
+            className="flex items-center gap-2 hover:opacity-80 transition-opacity"
           >
-            {/* <CHANGE> Updated orange-accent to accent */}
-            {/* <div className="w-6 h-6 bg-accent rounded-full animate-pulse" /> */}
             <span className="font-serif text-lg font-bold tracking-tight">
               Continuum
             </span>
-          </button>
+          </Link>
           <div className="hidden md:flex items-center gap-6 text-sm text-muted-foreground font-medium">
-            <button
-              onClick={() => scrollToSection("features")}
-              className="hover:text-foreground transition-colors"
-            >
-              Features
-            </button>
-            <button
-              onClick={() => scrollToSection("features")}
-              className="hover:text-foreground transition-colors"
-            >
-              Integrations
-            </button>
-            <Link
-              href="/install"
-              className="hover:text-foreground transition-colors"
-            >
-              Install
-            </Link>
+            {isInstallPage ? (
+              <>
+                <Link
+                  href="/#features"
+                  className="hover:text-foreground transition-colors"
+                >
+                  Features
+                </Link>
+                <Link
+                  href="/#features"
+                  className="hover:text-foreground transition-colors"
+                >
+                  Integrations
+                </Link>
+                {/* <Link
+                  href="/install"
+                  className="px-4 py-1.5 rounded-full bg-accent text-background hover:bg-accent/90 border border-accent transition-colors font-medium shadow-lg shadow-accent/20"
+                >
+                  Install
+                </Link> */}
+              </>
+            ) : (
+              <>
+                <button
+                  onClick={() => scrollToSection("features")}
+                  className="hover:text-foreground transition-colors"
+                >
+                  Features
+                </button>
+                <button
+                  onClick={() => scrollToSection("features")}
+                  className="hover:text-foreground transition-colors"
+                >
+                  Integrations
+                </button>
+
+              </>
+            )}
           </div>
         </div>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => scrollToSection("waitlist")}
-          className="rounded-full bg-foreground text-white hover:bg-foreground/90 transition-all border-none font-medium"
-        >
-          Join Waitlist
-        </Button>
+        {isInstallPage ? (
+          <Link href="/#waitlist">
+            <Button
+              variant="outline"
+              size="sm"
+              className="rounded-full bg-foreground text-white hover:bg-foreground/90 transition-all border-none font-medium"
+            >
+              Join Waitlist
+            </Button>
+          </Link>
+        ) : (
+          <div className="space-x-2">
+
+            <Link
+              href="/install"
+            >
+              <Button className="rounded-full bg-foreground text-white hover:bg-foreground/90 transition-all border-none font-medium"
+                variant="outline"
+              >
+                Beta Access!
+              </Button>
+            </Link>
+
+            {/* <Button
+              variant="outline"
+              size="sm"
+              onClick={() => scrollToSection("waitlist")}
+              className="rounded-full bg-foreground text-white hover:bg-foreground/90 transition-all border-none font-medium"
+            >
+              Join Waitlist
+            </Button> */}
+          </div>
+        )}
       </nav>
     </motion.header>
   );
