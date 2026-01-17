@@ -48,7 +48,9 @@ function SetupContent() {
 
   const fetchSetupStatus = async (id: string) => {
     try {
-      const redirectUri = encodeURIComponent(window.location.href);
+      const redirectUri = typeof window !== "undefined" 
+        ? encodeURIComponent(window.location.href)
+        : "";
       const res = await fetch(
         `${API_URL}/setup/status?workspace_id=${id}&redirect_uri=${redirectUri}`
       );
@@ -91,20 +93,44 @@ function SetupContent() {
       return;
     }
 
-    // Fetch setup status
-    fetchSetupStatus(workspaceId);
+    // Fetch setup status (only on client)
+    if (typeof window !== "undefined") {
+      fetchSetupStatus(workspaceId);
+    }
   }, [workspaceId, errorParam]);
 
   // Refresh status when returning from OAuth (page becomes visible)
   useEffect(() => {
-    if (workspaceId && document.visibilityState === "visible" && !loading) {
-      // Refresh status after a short delay to allow backend to process
-      const timer = setTimeout(() => {
-        fetchSetupStatus(workspaceId);
-      }, 1000);
-      return () => clearTimeout(timer);
+    if (
+      typeof window === "undefined" ||
+      typeof document === "undefined" ||
+      !workspaceId ||
+      loading
+    ) {
+      return;
     }
-  }, [workspaceId, document.visibilityState]);
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible" && !loading) {
+        // Refresh status after a short delay to allow backend to process
+        setTimeout(() => {
+          fetchSetupStatus(workspaceId);
+        }, 1000);
+      }
+    };
+
+    // Check on mount if page is visible
+    if (document.visibilityState === "visible") {
+      handleVisibilityChange();
+    }
+
+    // Listen for visibility changes
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [workspaceId, loading]);
 
   // Loading state
   if (loading) {
