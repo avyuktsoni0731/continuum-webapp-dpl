@@ -3,14 +3,29 @@
 import { Navbar } from "@/components/navbar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { BetaAccessGate } from "@/components/beta-access-gate";
 import { motion } from "framer-motion";
 import { Check, Slack, Github, Database, ArrowRight, Zap } from "lucide-react";
 import Link from "next/link";
+import { useState, useEffect } from "react";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://api.continuumworks.app";
+const BETA_ENABLED = process.env.NEXT_PUBLIC_BETA_ENABLED === "true";
 
 export default function InstallPage() {
-  return (
+  const [accessGranted, setAccessGranted] = useState(false);
+
+  // Check if already granted in this session
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const alreadyGranted = sessionStorage.getItem("beta_access_granted") === "true";
+      if (alreadyGranted) {
+        setAccessGranted(true);
+      }
+    }
+  }, []);
+
+  const installContent = (
     <main className="min-h-screen">
       <Navbar />
       
@@ -281,4 +296,16 @@ export default function InstallPage() {
       </section>
     </main>
   );
+
+  // If beta is enabled, show access gate
+  if (BETA_ENABLED) {
+    return (
+      <BetaAccessGate onAccessGranted={() => setAccessGranted(true)}>
+        {installContent}
+      </BetaAccessGate>
+    );
+  }
+
+  // Otherwise, show content directly
+  return installContent;
 }
