@@ -466,6 +466,15 @@ function SetupContent() {
               Integrations can be connected later from Slack. Start using
               Continuum with basic features right away!
             </p>
+            <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground mb-4">
+              <span>Need help?</span>
+              <Link
+                href="/docs/introduction"
+                className="text-accent hover:text-accent/80 transition-colors font-medium"
+              >
+                View Documentation →
+              </Link>
+            </div>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <a
                 href="https://slack.com"

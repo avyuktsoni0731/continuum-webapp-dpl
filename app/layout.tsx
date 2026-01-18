@@ -18,7 +18,7 @@ const fraunces = Fraunces({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://continuum.app"),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://continuumworks.app"),
   title: {
     default: "Continuum | Unified Intelligence for Teams",
     template: "%s | Continuum",

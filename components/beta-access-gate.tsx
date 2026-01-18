@@ -79,7 +79,7 @@ export function BetaAccessGate({ children, onAccessGranted }: BetaAccessGateProp
             <Button
               variant="outline"
               size="sm"
-              className="rounded-full bg-foreground text-background hover:bg-foreground/90 transition-all border-none font-medium"
+              className="rounded-full bg-foreground text-white hover:bg-foreground/90 transition-all border-none font-medium"
             >
               Join Waitlist
             </Button>
