@@ -58,7 +58,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: process.env.NEXT_PUBLIC_SITE_URL || "https://continuum.app",
+    url: process.env.NEXT_PUBLIC_SITE_URL || "https://continuumworks.app",
     siteName: "Continuum",
     title: "Continuum | Unified Intelligence for Teams",
     description:
@@ -100,7 +100,7 @@ export const metadata: Metadata = {
     // yahoo: "your-yahoo-verification-code",
   },
   alternates: {
-    canonical: process.env.NEXT_PUBLIC_SITE_URL || "https://continuum.app",
+    canonical: process.env.NEXT_PUBLIC_SITE_URL || "https://continuumworks.app",
   },
   category: "technology",
 };
