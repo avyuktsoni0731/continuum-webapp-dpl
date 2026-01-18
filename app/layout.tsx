@@ -65,7 +65,7 @@ export const metadata: Metadata = {
       "Stop context switching between your tools. Continuum orchestrates the platforms your team already uses through natural language in Slack—with smart delegation, always-on context, and intelligent automation.",
     images: [
       {
-        url: "/og-image.png",
+        url: "/twitter-og.png",
         width: 1200,
         height: 630,
         alt: "Continuum - Unified Intelligence for Teams",
@@ -78,7 +78,7 @@ export const metadata: Metadata = {
     title: "Continuum | Unified Intelligence for Teams",
     description:
       "Stop context switching between your tools. Continuum orchestrates the platforms your team already uses through natural language in Slack.",
-    images: ["/og-image.png"],
+    images: ["/twitter-og.png"],
     creator: "@avyukt_soni",
     site: "@avyukt_soni",
   },
