@@ -17,7 +17,7 @@ export default function QuickStartPage() {
               1
             </div>
             <div className="flex-1">
-              <h2 className="text-3xl md:text-4xl font-serif font-medium mb-4 mt-0 leading-tight">Install Continuum (2 minutes)</h2>
+              <h2 className="text-3xl md:text-4xl font-serif font-medium mb-4 mt-0 leading-tight">Install Continuum</h2>
               <ol className="mt-2 space-y-3 text-base">
                 <li>Visit the <a href="/install" className="text-accent hover:text-accent/90 underline decoration-accent/50 hover:decoration-accent transition-colors font-medium">Continuum install page</a></li>
                 <li>Click <strong>"Add to Slack"</strong> button</li>
@@ -52,7 +52,7 @@ export default function QuickStartPage() {
               2
             </div>
             <div className="flex-1">
-              <h2 className="text-3xl md:text-4xl font-serif font-medium mb-4 mt-0 leading-tight">Connect Jira (Optional, 1 minute)</h2>
+              <h2 className="text-3xl md:text-4xl font-serif font-medium mb-4 mt-0 leading-tight">Connect Jira</h2>
               <ol className="mt-2 space-y-3 text-base">
                 <li>On the setup page, click <strong>"Connect Jira"</strong></li>
                 <li>You'll be redirected to Atlassian</li>
@@ -70,7 +70,7 @@ export default function QuickStartPage() {
               3
             </div>
             <div className="flex-1">
-              <h2 className="text-3xl md:text-4xl font-serif font-medium mb-4 mt-0 leading-tight">Connect GitHub (Optional, 1 minute)</h2>
+              <h2 className="text-3xl md:text-4xl font-serif font-medium mb-4 mt-0 leading-tight">Connect GitHub</h2>
               <ol className="mt-2 space-y-3 text-base">
                 <li>On the setup page, click <strong>"Connect GitHub"</strong></li>
                 <li>You'll be redirected to GitHub</li>
@@ -87,7 +87,7 @@ export default function QuickStartPage() {
               4
             </div>
             <div className="flex-1">
-              <h2 className="text-3xl md:text-4xl font-serif font-medium mb-4 mt-0 leading-tight">Start Using (1 minute)</h2>
+              <h2 className="text-3xl md:text-4xl font-serif font-medium mb-4 mt-0 leading-tight">Start Using</h2>
               <p className="mt-2 text-base">In any Slack channel or DM, try:</p>
               <pre className="bg-card border border-border rounded-lg p-5 mt-3 text-sm leading-relaxed">
                 <code className="text-foreground">{`@continuum show my tasks`}</code>
