@@ -158,6 +158,8 @@
 
 .prose p {
   @apply text-muted-foreground leading-relaxed mb-4;
+  font-size: 1rem;
+  line-height: 1.7;
 }
 
 .prose ul, .prose ol {
@@ -165,11 +167,12 @@
 }
 
 .prose li {
-  @apply text-muted-foreground;
+  @apply text-muted-foreground leading-relaxed;
 }
 
 .prose code {
   @apply bg-card border border-border px-1.5 py-0.5 rounded text-sm font-mono text-foreground;
+  color: oklch(0.95 0 0);
 }
 
 .prose pre {
@@ -181,7 +184,8 @@
 }
 
 .prose a {
-  @apply text-accent hover:text-accent/80 underline;
+  @apply text-accent hover:text-accent/90 underline decoration-accent/50 hover:decoration-accent transition-colors;
+  color: oklch(0.65 0.25 45); /* High-energy orange accent */
 }
 
 .prose strong {

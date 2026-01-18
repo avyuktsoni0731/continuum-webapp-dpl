@@ -10,16 +10,16 @@ export default function QuickStartPage() {
         Follow these steps to get Continuum up and running:
       </p>
 
-      <div className="space-y-8 mt-8">
+      <div className="space-y-12 mt-8">
         <section>
-          <div className="flex items-start gap-4">
-            <div className="shrink-0 w-8 h-8 rounded-full bg-accent/20 text-accent flex items-center justify-center font-bold">
+          <div className="flex gap-6">
+            <div className="shrink-0 w-12 h-12 rounded-full bg-accent/10 text-muted-foreground/60 flex items-center justify-center font-serif text-2xl font-medium border border-border/50 mt-1">
               1
             </div>
             <div className="flex-1">
-              <h2>Install Continuum (2 minutes)</h2>
-              <ol className="mt-2 space-y-2">
-                <li>Visit the <a href="/install" className="text-accent hover:underline">Continuum install page</a></li>
+              <h2 className="text-3xl md:text-4xl font-serif font-medium mb-4 mt-0 leading-tight">Install Continuum (2 minutes)</h2>
+              <ol className="mt-2 space-y-3 text-base">
+                <li>Visit the <a href="/install" className="text-accent hover:text-accent/90 underline decoration-accent/50 hover:decoration-accent transition-colors font-medium">Continuum install page</a></li>
                 <li>Click <strong>"Add to Slack"</strong> button</li>
                 <li>Select your Slack workspace</li>
                 <li>Review and authorize permissions</li>
@@ -47,13 +47,13 @@ export default function QuickStartPage() {
         </section>
 
         <section>
-          <div className="flex items-start gap-4">
-            <div className="shrink-0 w-8 h-8 rounded-full bg-accent/20 text-accent flex items-center justify-center font-bold">
+          <div className="flex gap-6 items-start">
+            <div className="shrink-0 w-12 h-12 rounded-full bg-accent/10 text-muted-foreground/60 flex items-center justify-center font-serif text-2xl font-medium border border-border/50">
               2
             </div>
-            <div className="flex-1">
-              <h2>Connect Jira (Optional, 1 minute)</h2>
-              <ol className="mt-2 space-y-2">
+            <div className="flex-1 pt-1">
+              <h2 className="text-3xl md:text-4xl font-serif font-medium mb-4 mt-0">Connect Jira (Optional, 1 minute)</h2>
+              <ol className="mt-2 space-y-3 text-base">
                 <li>On the setup page, click <strong>"Connect Jira"</strong></li>
                 <li>You'll be redirected to Atlassian</li>
                 <li>Select your Jira site/workspace</li>
@@ -65,13 +65,13 @@ export default function QuickStartPage() {
         </section>
 
         <section>
-          <div className="flex items-start gap-4">
-            <div className="shrink-0 w-8 h-8 rounded-full bg-accent/20 text-accent flex items-center justify-center font-bold">
+          <div className="flex gap-6 items-start">
+            <div className="shrink-0 w-12 h-12 rounded-full bg-accent/10 text-muted-foreground/60 flex items-center justify-center font-serif text-2xl font-medium border border-border/50">
               3
             </div>
-            <div className="flex-1">
-              <h2>Connect GitHub (Optional, 1 minute)</h2>
-              <ol className="mt-2 space-y-2">
+            <div className="flex-1 pt-1">
+              <h2 className="text-3xl md:text-4xl font-serif font-medium mb-4 mt-0">Connect GitHub (Optional, 1 minute)</h2>
+              <ol className="mt-2 space-y-3 text-base">
                 <li>On the setup page, click <strong>"Connect GitHub"</strong></li>
                 <li>You'll be redirected to GitHub</li>
                 <li>Review and authorize permissions</li>
@@ -82,19 +82,19 @@ export default function QuickStartPage() {
         </section>
 
         <section>
-          <div className="flex items-start gap-4">
-            <div className="shrink-0 w-8 h-8 rounded-full bg-accent/20 text-accent flex items-center justify-center font-bold">
+          <div className="flex gap-6 items-start">
+            <div className="shrink-0 w-12 h-12 rounded-full bg-accent/10 text-muted-foreground/60 flex items-center justify-center font-serif text-2xl font-medium border border-border/50">
               4
             </div>
-            <div className="flex-1">
-              <h2>Start Using (1 minute)</h2>
-              <p className="mt-2">In any Slack channel or DM, try:</p>
-              <pre className="bg-card border border-border rounded-lg p-4 mt-2">
-                <code>{`@continuum show my tasks`}</code>
+            <div className="flex-1 pt-1">
+              <h2 className="text-3xl md:text-4xl font-serif font-medium mb-4 mt-0">Start Using (1 minute)</h2>
+              <p className="mt-2 text-base">In any Slack channel or DM, try:</p>
+              <pre className="bg-card border border-border rounded-lg p-5 mt-3 text-sm leading-relaxed">
+                <code className="text-foreground">{`@continuum show my tasks`}</code>
               </pre>
-              <p className="mt-4">Or if you connected GitHub:</p>
-              <pre className="bg-card border border-border rounded-lg p-4 mt-2">
-                <code>{`@continuum show my pull requests`}</code>
+              <p className="mt-4 text-base">Or if you connected GitHub:</p>
+              <pre className="bg-card border border-border rounded-lg p-5 mt-3 text-sm leading-relaxed">
+                <code className="text-foreground">{`@continuum show my pull requests`}</code>
               </pre>
             </div>
           </div>

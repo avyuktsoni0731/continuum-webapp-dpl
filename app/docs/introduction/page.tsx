@@ -11,26 +11,26 @@ export default function IntroductionPage() {
       </p>
 
       <h2>What You Can Do</h2>
-      <p>With Continuum, you can:</p>
-      <ul>
-        <li>📋 <strong>Query Jira</strong>: Get issue details, search tasks, check sprint status</li>
-        <li>🔀 <strong>Manage GitHub</strong>: View PRs, check review status, merge requests</li>
-        <li>🧠 <strong>Smart Delegation</strong>: Get AI-powered task assignment suggestions</li>
-        <li>💬 <strong>Natural Language</strong>: Ask questions in plain English</li>
-        <li>🔄 <strong>Execute Actions</strong>: Create issues, update statuses, assign tasks</li>
+      <p className="text-lg">With Continuum, you can:</p>
+      <ul className="space-y-3 text-base">
+        <li>📋 <strong className="text-foreground">Query Jira</strong>: Get issue details, search tasks, check sprint status</li>
+        <li>🔀 <strong className="text-foreground">Manage GitHub</strong>: View PRs, check review status, merge requests</li>
+        <li>🧠 <strong className="text-foreground">Smart Delegation</strong>: Get AI-powered task assignment suggestions</li>
+        <li>💬 <strong className="text-foreground">Natural Language</strong>: Ask questions in plain English</li>
+        <li>🔄 <strong className="text-foreground">Execute Actions</strong>: Create issues, update statuses, assign tasks</li>
       </ul>
 
       <h2>How It Works</h2>
-      <ol>
-        <li><strong>Install</strong> Continuum to your Slack workspace</li>
-        <li><strong>Connect</strong> your Jira and/or GitHub accounts (OAuth-based, secure)</li>
-        <li><strong>Start using</strong> by mentioning <code>@continuum</code> in any channel or DM</li>
-        <li><strong>Ask naturally</strong> and get rich, formatted responses</li>
+      <ol className="space-y-3 text-base">
+        <li><strong className="text-foreground">Install</strong> Continuum to your Slack workspace</li>
+        <li><strong className="text-foreground">Connect</strong> your Jira and/or GitHub accounts (OAuth-based, secure)</li>
+        <li><strong className="text-foreground">Start using</strong> by mentioning <code className="bg-card border border-border px-1.5 py-0.5 rounded text-sm font-mono text-foreground">@continuum</code> in any channel or DM</li>
+        <li><strong className="text-foreground">Ask naturally</strong> and get rich, formatted responses</li>
       </ol>
 
       <h2>Example</h2>
-      <pre className="bg-card border border-border rounded-lg p-4 overflow-x-auto">
-        <code>{`You: @continuum show my open tasks
+      <pre className="bg-card border border-border rounded-lg p-5 overflow-x-auto text-sm leading-relaxed">
+        <code className="text-foreground">{`You: @continuum show my open tasks
 
 Continuum: 📋 Here are your open tasks:
 

@@ -12,16 +12,16 @@ export default function PrerequisitesPage() {
 
       <section className="mt-8">
         <h2>Required</h2>
-        
+
         <div className="mt-4 space-y-6">
           <div className="p-4 bg-card border border-border rounded-lg">
             <h3 className="flex items-center gap-2">
               <span className="text-2xl">1.</span> Slack Workspace
             </h3>
-            <ul className="mt-2 space-y-1">
-              <li>• <strong>Free or paid Slack workspace</strong></li>
-              <li>• <strong>Admin permissions</strong> to install apps (or request admin approval)</li>
-              <li>• <strong>Slack web app access</strong> (for OAuth flow)</li>
+            <ul className="mt-2 space-y-2 text-base">
+              <li>• <strong className="text-foreground">Free or paid Slack workspace</strong></li>
+              <li>• <strong className="text-foreground">Admin permissions</strong> to install apps (or request admin approval)</li>
+              <li>• <strong className="text-foreground">Slack web app access</strong> (for OAuth flow)</li>
             </ul>
             <div className="mt-3 p-3 bg-background/50 rounded border border-border">
               <p className="text-sm font-medium mb-1">How to check:</p>
@@ -33,7 +33,7 @@ export default function PrerequisitesPage() {
             <h3 className="flex items-center gap-2">
               <span className="text-2xl">2.</span> Active Internet Connection
             </h3>
-            <ul className="mt-2 space-y-1">
+            <ul className="mt-2 space-y-2 text-base">
               <li>• Stable internet for OAuth flows</li>
               <li>• Access to external APIs (Jira, GitHub)</li>
             </ul>
@@ -43,16 +43,16 @@ export default function PrerequisitesPage() {
 
       <section className="mt-8">
         <h2>Optional (But Recommended)</h2>
-        
+
         <div className="mt-4 space-y-6">
           <div className="p-4 bg-card border border-border rounded-lg">
             <h3 className="flex items-center gap-2">
               <span className="text-2xl">3.</span> Jira Cloud Account
             </h3>
-            <ul className="mt-2 space-y-1">
-              <li>• <strong>Jira Cloud workspace</strong> (not Jira Server/Data Center)</li>
-              <li>• <strong>Admin or user access</strong> to the workspace you want to connect</li>
-              <li>• <strong>Jira API access</strong> (usually enabled by default)</li>
+            <ul className="mt-2 space-y-2 text-base">
+              <li>• <strong className="text-foreground">Jira Cloud workspace</strong> (not Jira Server/Data Center)</li>
+              <li>• <strong className="text-foreground">Admin or user access</strong> to the workspace you want to connect</li>
+              <li>• <strong className="text-foreground">Jira API access</strong> (usually enabled by default)</li>
             </ul>
             <div className="mt-3 p-3 bg-yellow-500/10 border border-yellow-500/20 rounded">
               <p className="text-sm"><strong>Note:</strong> Jira Server/Data Center support coming soon.</p>
@@ -63,10 +63,10 @@ export default function PrerequisitesPage() {
             <h3 className="flex items-center gap-2">
               <span className="text-2xl">4.</span> GitHub Account
             </h3>
-            <ul className="mt-2 space-y-1">
-              <li>• <strong>GitHub.com account</strong> (personal or organization)</li>
-              <li>• <strong>Access to repositories</strong> you want to manage</li>
-              <li>• <strong>OAuth app permissions</strong> (Continuum will request minimal permissions)</li>
+            <ul className="mt-2 space-y-2 text-base">
+              <li>• <strong className="text-foreground">GitHub.com account</strong> (personal or organization)</li>
+              <li>• <strong className="text-foreground">Access to repositories</strong> you want to manage</li>
+              <li>• <strong className="text-foreground">OAuth app permissions</strong> (Continuum will request minimal permissions)</li>
             </ul>
           </div>
         </div>
@@ -74,12 +74,12 @@ export default function PrerequisitesPage() {
 
       <section className="mt-8">
         <h2>Permissions Required</h2>
-        
+
         <div className="mt-4 space-y-4">
           <div className="p-4 bg-card border border-border rounded-lg">
             <h3>Slack Permissions</h3>
             <ul className="mt-2 space-y-1 text-sm">
-              <li><code>app_mentions:read</code> - To see when you mention Continuum</li>
+              <li><code className="bg-card border border-border px-1.5 py-0.5 rounded text-sm font-mono text-foreground">app_mentions:read</code> - To see when you mention Continuum</li>
               <li><code>chat:write</code> - To respond with messages</li>
               <li><code>commands</code> - For slash commands</li>
               <li><code>im:history</code> / <code>im:read</code> - For DM conversations</li>
