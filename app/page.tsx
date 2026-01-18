@@ -3,6 +3,7 @@
 import { Navbar } from "@/components/navbar";
 import { Hero } from "@/components/hero";
 import { Features } from "@/components/features";
+import { TwitterVideo } from "@/components/twitter-video";
 import { Toaster } from "@/components/sonner";
 import { motion } from "framer-motion";
 import { useInView } from "framer-motion";
@@ -10,13 +11,61 @@ import { useRef } from "react";
 
 export default function LandingPage() {
   const ctaRef = useRef(null);
+  const videoRef = useRef(null);
   const ctaInView = useInView(ctaRef, { once: true, margin: "-100px" });
+  const videoInView = useInView(videoRef, { once: true, margin: "-100px" });
 
   return (
     <main className="min-h-screen">
       <Navbar />
       <Hero />
       <Features />
+
+      {/* Video Demo Section */}
+      <section
+        ref={videoRef}
+        id="demo"
+        className="py-24 px-4 border-t border-border/50 bg-background/50"
+      >
+        <div className="max-w-6xl mx-auto space-y-12">
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            animate={videoInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
+            transition={{ duration: 0.6 }}
+            className="text-center space-y-4"
+          >
+            <h2 className="text-5xl md:text-7xl font-serif">
+              Multi-Tool Orchestration
+            </h2>
+            <p className="max-w-2xl mx-auto text-muted-foreground text-lg">
+              See how Continuum handles complex workflows in seconds—6 isolated
+              instructions, one command, zero context switching.
+            </p>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={videoInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="flex justify-center"
+          >
+            <div className="w-full max-w-2xl">
+              <TwitterVideo />
+            </div>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={videoInView ? { opacity: 1 } : { opacity: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="text-center pt-8"
+          >
+            <p className="text-sm text-muted-foreground/60 uppercase tracking-[0.2em]">
+              A killer performance boost for your team's productivity
+            </p>
+          </motion.div>
+        </div>
+      </section>
 
       {/* "Ready" Section inspired by Brillance */}
       <section
