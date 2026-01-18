@@ -149,7 +149,7 @@
 }
 
 .prose h2 {
-  @apply text-3xl md:text-4xl font-serif font-medium mb-4 mt-8;
+  @apply text-3xl md:text-4xl font-serif font-medium mb-4 mt-2;
 }
 
 .prose h3 {

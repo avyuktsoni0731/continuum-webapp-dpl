@@ -47,12 +47,12 @@ export default function QuickStartPage() {
         </section>
 
         <section>
-          <div className="flex gap-6 items-start">
-            <div className="shrink-0 w-12 h-12 rounded-full bg-accent/10 text-muted-foreground/60 flex items-center justify-center font-serif text-2xl font-medium border border-border/50">
+          <div className="flex gap-6">
+            <div className="shrink-0 w-12 h-12 rounded-full bg-accent/10 text-muted-foreground/60 flex items-center justify-center font-serif text-2xl font-medium border border-border/50 mt-1">
               2
             </div>
-            <div className="flex-1 pt-1">
-              <h2 className="text-3xl md:text-4xl font-serif font-medium mb-4 mt-0">Connect Jira (Optional, 1 minute)</h2>
+            <div className="flex-1">
+              <h2 className="text-3xl md:text-4xl font-serif font-medium mb-4 mt-0 leading-tight">Connect Jira (Optional, 1 minute)</h2>
               <ol className="mt-2 space-y-3 text-base">
                 <li>On the setup page, click <strong>"Connect Jira"</strong></li>
                 <li>You'll be redirected to Atlassian</li>
@@ -65,12 +65,12 @@ export default function QuickStartPage() {
         </section>
 
         <section>
-          <div className="flex gap-6 items-start">
-            <div className="shrink-0 w-12 h-12 rounded-full bg-accent/10 text-muted-foreground/60 flex items-center justify-center font-serif text-2xl font-medium border border-border/50">
+          <div className="flex gap-6">
+            <div className="shrink-0 w-12 h-12 rounded-full bg-accent/10 text-muted-foreground/60 flex items-center justify-center font-serif text-2xl font-medium border border-border/50 mt-1">
               3
             </div>
-            <div className="flex-1 pt-1">
-              <h2 className="text-3xl md:text-4xl font-serif font-medium mb-4 mt-0">Connect GitHub (Optional, 1 minute)</h2>
+            <div className="flex-1">
+              <h2 className="text-3xl md:text-4xl font-serif font-medium mb-4 mt-0 leading-tight">Connect GitHub (Optional, 1 minute)</h2>
               <ol className="mt-2 space-y-3 text-base">
                 <li>On the setup page, click <strong>"Connect GitHub"</strong></li>
                 <li>You'll be redirected to GitHub</li>
@@ -82,12 +82,12 @@ export default function QuickStartPage() {
         </section>
 
         <section>
-          <div className="flex gap-6 items-start">
-            <div className="shrink-0 w-12 h-12 rounded-full bg-accent/10 text-muted-foreground/60 flex items-center justify-center font-serif text-2xl font-medium border border-border/50">
+          <div className="flex gap-6">
+            <div className="shrink-0 w-12 h-12 rounded-full bg-accent/10 text-muted-foreground/60 flex items-center justify-center font-serif text-2xl font-medium border border-border/50 mt-1">
               4
             </div>
-            <div className="flex-1 pt-1">
-              <h2 className="text-3xl md:text-4xl font-serif font-medium mb-4 mt-0">Start Using (1 minute)</h2>
+            <div className="flex-1">
+              <h2 className="text-3xl md:text-4xl font-serif font-medium mb-4 mt-0 leading-tight">Start Using (1 minute)</h2>
               <p className="mt-2 text-base">In any Slack channel or DM, try:</p>
               <pre className="bg-card border border-border rounded-lg p-5 mt-3 text-sm leading-relaxed">
                 <code className="text-foreground">{`@continuum show my tasks`}</code>
