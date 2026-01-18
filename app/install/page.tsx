@@ -28,7 +28,7 @@ export default function InstallPage() {
   const installContent = (
     <main className="min-h-screen">
       <Navbar />
-      
+
       {/* Hero Section */}
       <section className="relative pt-40 pb-20 px-4 overflow-hidden">
         {/* Background elements */}

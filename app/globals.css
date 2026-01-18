@@ -139,6 +139,55 @@
   background-color: white;
 }
 
+/* Documentation prose styles */
+.prose {
+  @apply text-foreground;
+}
+
+.prose h1 {
+  @apply text-4xl md:text-5xl font-serif font-medium mb-6 mt-0;
+}
+
+.prose h2 {
+  @apply text-3xl md:text-4xl font-serif font-medium mb-4 mt-8;
+}
+
+.prose h3 {
+  @apply text-2xl font-serif font-medium mb-3 mt-6;
+}
+
+.prose p {
+  @apply text-muted-foreground leading-relaxed mb-4;
+}
+
+.prose ul, .prose ol {
+  @apply space-y-2 mb-4 pl-6;
+}
+
+.prose li {
+  @apply text-muted-foreground;
+}
+
+.prose code {
+  @apply bg-card border border-border px-1.5 py-0.5 rounded text-sm font-mono text-foreground;
+}
+
+.prose pre {
+  @apply bg-card border border-border rounded-lg p-4 overflow-x-auto mb-4;
+}
+
+.prose pre code {
+  @apply bg-transparent border-0 p-0;
+}
+
+.prose a {
+  @apply text-accent hover:text-accent/80 underline;
+}
+
+.prose strong {
+  @apply font-semibold text-foreground;
+}
+
 /* Lenis smooth scroll styles */
 html.lenis,
 html.lenis body {
