@@ -192,7 +192,7 @@ export default function InstallPage() {
             </p>
             <Link
               href="/docs/introduction"
-              className="inline-flex items-center gap-2 text-accent hover:text-accent/80 transition-colors font-medium"
+              className="inline-flex items-center gap-2 text-white hover:text-accent/80 transition-colors font-medium"
             >
               View Documentation
               <ArrowRight className="w-4 h-4" />

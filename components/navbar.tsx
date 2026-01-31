@@ -51,6 +51,10 @@ export function Navbar() {
                 >
                   Integrations
                 </Link>
+                <Link href="/docs" className="hover:text-foreground transition-colors"
+                >
+                  Docs
+                </Link>
                 {/* <Link
                   href="/install"
                   className="px-4 py-1.5 rounded-full bg-accent text-background hover:bg-accent/90 border border-accent transition-colors font-medium shadow-lg shadow-accent/20"
@@ -78,13 +82,13 @@ export function Navbar() {
           </div>
         </div>
         {isInstallPage ? (
-          <Link href="/#waitlist">
+          <Link href="/install">
             <Button
               variant="outline"
               size="sm"
               className="rounded-full bg-foreground text-white hover:bg-foreground/90 transition-all border-none font-medium"
             >
-              Join Waitlist
+              Beta Access!
             </Button>
           </Link>
         ) : (
