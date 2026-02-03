@@ -2,14 +2,12 @@
 
 import { Navbar } from "@/components/navbar";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { BetaAccessGate } from "@/components/beta-access-gate";
+import { AddToSlackButton } from "@/components/add-to-slack-button";
 import { motion } from "framer-motion";
 import { Check, Slack, Github, Database, ArrowRight, Zap } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect } from "react";
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://api.continuumworks.app";
 const BETA_ENABLED = process.env.NEXT_PUBLIC_BETA_ENABLED === "true";
 
 export default function InstallPage() {
@@ -80,20 +78,7 @@ export default function InstallPage() {
             transition={{ duration: 0.6, delay: 0.7 }}
             className="pt-8"
           >
-            <a
-              href={`${API_URL}/slack/install?redirect_uri=${encodeURIComponent(
-                typeof window !== "undefined"
-                  ? `${window.location.origin}/setup`
-                  : "https://continuumworks.app/setup"
-              )}`}
-              className="inline-block group"
-            >
-              <div className="flex items-center gap-4 px-8 py-5 bg-[#4A154B] hover:bg-[#5A1B5B] text-white rounded-full font-medium text-lg transition-all hover:scale-[1.02] active:scale-95 shadow-2xl shadow-[#4A154B]/30">
-                <Slack className="w-6 h-6" />
-                <span>Add to Slack</span>
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </div>
-            </a>
+            <AddToSlackButton />
             <p className="mt-4 text-xs text-muted-foreground/60 uppercase tracking-[0.2em]">
               Requires workspace admin approval
             </p>
@@ -301,20 +286,7 @@ export default function InstallPage() {
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            <a
-              href={`${API_URL}/slack/install?redirect_uri=${encodeURIComponent(
-                typeof window !== "undefined"
-                  ? `${window.location.origin}/setup`
-                  : "https://continuumworks.app/setup"
-              )}`}
-              className="inline-block group"
-            >
-              <div className="flex items-center gap-4 px-12 py-6 bg-[#4A154B] hover:bg-[#5A1B5B] text-white rounded-full font-serif text-2xl font-medium transition-all hover:scale-[1.02] active:scale-95 shadow-2xl shadow-[#4A154B]/30">
-                <Slack className="w-7 h-7" />
-                <span>Add to Slack</span>
-                <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
-              </div>
-            </a>
+            <AddToSlackButton variant="large" />
           </motion.div>
         </div>
       </section>
