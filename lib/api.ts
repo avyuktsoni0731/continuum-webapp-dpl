@@ -3,7 +3,10 @@
  * Sends Bearer token when provided for authenticated requests.
  */
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const API_URL =
+  process.env.API_URL ||
+  process.env.NEXT_PUBLIC_API_URL ||
+  "http://localhost:8000";
 
 export class ApiError extends Error {
   constructor(

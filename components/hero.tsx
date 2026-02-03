@@ -58,7 +58,7 @@ export function Hero() {
           className="pt-2"
         >
           <Link
-            href="/install"
+            href="/register"
             className="group inline-flex items-center gap-2 px-8 py-4 rounded-full bg-accent text-accent-foreground font-medium text-lg hover:bg-accent/90 transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-accent/25"
           >
             Get early access

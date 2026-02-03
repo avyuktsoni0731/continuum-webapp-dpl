@@ -1,5 +1,6 @@
 "use client";
 
+import { useSession } from "next-auth/react";
 import { Navbar } from "@/components/navbar";
 import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
@@ -36,6 +37,7 @@ interface SetupStatus {
 }
 
 function SetupContent() {
+  const { data: session } = useSession();
   const searchParams = useSearchParams();
   const router = useRouter();
   const [status, setStatus] = useState<SetupStatus | null>(null);
@@ -51,8 +53,13 @@ function SetupContent() {
       const redirectUri = typeof window !== "undefined" 
         ? encodeURIComponent(window.location.href)
         : "";
+      const headers: HeadersInit = {};
+      if (session?.accessToken) {
+        headers["Authorization"] = `Bearer ${session.accessToken}`;
+      }
       const res = await fetch(
-        `${API_URL}/setup/status?workspace_id=${id}&redirect_uri=${redirectUri}`
+        `${API_URL}/setup/status?workspace_id=${id}&redirect_uri=${redirectUri}`,
+        { headers }
       );
 
       if (!res.ok) {
@@ -97,7 +104,7 @@ function SetupContent() {
     if (typeof window !== "undefined") {
       fetchSetupStatus(workspaceId);
     }
-  }, [workspaceId, errorParam]);
+  }, [workspaceId, errorParam, session?.accessToken]);
 
   // Refresh status when returning from OAuth (page becomes visible)
   useEffect(() => {
@@ -130,7 +137,7 @@ function SetupContent() {
     return () => {
       document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
-  }, [workspaceId, loading]);
+  }, [workspaceId, loading, session?.accessToken]);
 
   // Loading state
   if (loading) {

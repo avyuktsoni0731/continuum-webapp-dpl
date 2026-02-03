@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useSession, signOut } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 
@@ -17,7 +18,9 @@ const scrollToSection = (id: string) => {
 
 export function Navbar() {
   const pathname = usePathname();
+  const { data: session, status } = useSession();
   const isInstallPage = pathname === "/install";
+  const isLoggedIn = status === "authenticated" && !!session;
 
   return (
     <motion.header
@@ -96,37 +99,45 @@ export function Navbar() {
             )}
           </div>
         </div>
-        {isInstallPage ? (
-          <Link href="/install">
+        {isLoggedIn ? (
+          <div className="flex items-center gap-2">
+            <Link href="/dashboard">
+              <Button
+                variant="outline"
+                size="sm"
+                className="rounded-full font-medium"
+              >
+                Dashboard
+              </Button>
+            </Link>
             <Button
               variant="outline"
               size="sm"
-              className="rounded-full bg-foreground text-white hover:bg-foreground/90 transition-all border-none font-medium"
+              className="rounded-full font-medium"
+              onClick={() => signOut({ callbackUrl: "/" })}
             >
-              Beta Access!
+              Sign out
             </Button>
-          </Link>
+          </div>
         ) : (
-          <div className="space-x-2">
-
-            <Link
-              href="/install"
-            >
-              <Button className="rounded-full bg-foreground text-white hover:bg-foreground/90 transition-all border-none font-medium"
-                variant="outline"
+          <div className="flex items-center gap-2">
+            <Link href="/login">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="rounded-full font-medium"
               >
-                Beta Access!
+                Log in
               </Button>
             </Link>
-
-            {/* <Button
-              variant="outline"
-              size="sm"
-              onClick={() => scrollToSection("waitlist")}
-              className="rounded-full bg-foreground text-white hover:bg-foreground/90 transition-all border-none font-medium"
-            >
-              Join Waitlist
-            </Button> */}
+            <Link href="/register">
+              <Button
+                size="sm"
+                className="rounded-full bg-foreground text-background hover:bg-foreground/90 border-none font-medium"
+              >
+                Get started
+              </Button>
+            </Link>
           </div>
         )}
       </nav>
