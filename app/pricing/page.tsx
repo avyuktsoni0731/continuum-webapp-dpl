@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -35,7 +35,7 @@ const FAQ_ITEMS = [
   },
 ];
 
-export default function PricingPage() {
+function PricingContent() {
   const [yearly, setYearly] = useState(false);
   const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
   const { data: session, status } = useSession();
@@ -283,5 +283,20 @@ export default function PricingPage() {
         </div>
       </footer>
     </main>
+  );
+}
+
+export default function PricingPage() {
+  return (
+    <Suspense fallback={
+      <main className="min-h-screen">
+        <Navbar />
+        <section className="pt-32 pb-20 px-4 text-center text-muted-foreground">
+          Loading...
+        </section>
+      </main>
+    }>
+      <PricingContent />
+    </Suspense>
   );
 }

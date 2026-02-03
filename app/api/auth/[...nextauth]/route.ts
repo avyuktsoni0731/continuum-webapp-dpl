@@ -1,4 +1,5 @@
-import NextAuth from "next-auth";
+import NextAuth, { type AuthOptions } from "next-auth";
+import type { JWT } from "next-auth/jwt";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import { apiFetch } from "@/lib/api";
@@ -55,7 +56,7 @@ export const authOptions = {
     }),
   ],
   callbacks: {
-    async signIn({ user, account }) {
+    async signIn({ user, account }: { user: { id?: string; accessToken?: string }; account: { provider?: string; id_token?: string } | null }) {
       if (account?.provider === "google" && account.id_token) {
         try {
           const data = await apiFetch<{
@@ -75,17 +76,18 @@ export const authOptions = {
       }
       return true;
     },
-    async jwt({ token, user }) {
+    async jwt({ token, user }: { token: JWT; user?: { id?: string; accessToken?: string } | null }) {
       if (user) {
-        token.accessToken = (user as { accessToken?: string }).accessToken;
+        token.accessToken = user.accessToken;
         token.accountId = user.id;
       }
       return token;
     },
-    async session({ session, token }) {
-      if (session.user) {
-        session.accessToken = token.accessToken;
-        session.accountId = token.accountId;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    async session({ session, token }: { session: any; token: JWT }) {
+      if (session?.user) {
+        (session as { accessToken?: string; accountId?: string }).accessToken = token.accessToken as string;
+        (session as { accessToken?: string; accountId?: string }).accountId = token.accountId as string;
       }
       return session;
     },
@@ -94,10 +96,10 @@ export const authOptions = {
     signIn: "/login",
   },
   session: {
-    strategy: "jwt",
+    strategy: "jwt" as const,
     maxAge: 30 * 24 * 60 * 60, // 30 days
   },
 };
 
-const handler = NextAuth(authOptions);
+const handler = NextAuth(authOptions as AuthOptions);
 export { handler as GET, handler as POST };

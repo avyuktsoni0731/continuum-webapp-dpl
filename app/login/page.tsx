@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { Loader2, Mail, Lock } from "lucide-react";
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
@@ -169,5 +169,22 @@ export default function LoginPage() {
         </motion.div>
       </section>
     </main>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <main className="min-h-screen">
+        <Navbar />
+        <section className="relative pt-32 pb-20 px-4">
+          <div className="max-w-md mx-auto text-center text-muted-foreground">
+            Loading...
+          </div>
+        </section>
+      </main>
+    }>
+      <LoginForm />
+    </Suspense>
   );
 }

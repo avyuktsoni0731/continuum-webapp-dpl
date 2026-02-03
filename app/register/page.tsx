@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
@@ -10,7 +10,7 @@ import { motion } from "framer-motion";
 import { Loader2, Mail, Lock, User } from "lucide-react";
 import { apiFetch, ApiError } from "@/lib/api";
 
-export default function RegisterPage() {
+function RegisterForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
@@ -202,5 +202,22 @@ export default function RegisterPage() {
         </motion.div>
       </section>
     </main>
+  );
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense fallback={
+      <main className="min-h-screen">
+        <Navbar />
+        <section className="relative pt-32 pb-20 px-4">
+          <div className="max-w-md mx-auto text-center text-muted-foreground">
+            Loading...
+          </div>
+        </section>
+      </main>
+    }>
+      <RegisterForm />
+    </Suspense>
   );
 }
