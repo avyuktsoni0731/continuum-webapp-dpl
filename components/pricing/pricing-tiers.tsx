@@ -163,7 +163,7 @@ export function PricingTiers() {
                         className={cn(
                           "w-full rounded-full font-medium",
                           tier.highlighted &&
-                            "border-accent bg-accent/10 text-accent hover:bg-accent/20"
+                          "border-accent bg-accent/10 text-accent hover:bg-accent/20"
                         )}
                         size="sm"
                       >

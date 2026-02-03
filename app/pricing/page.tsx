@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { FAQ } from "@/components/pricing/faq";
 import { Loader2, CheckCircle } from "lucide-react";
-import { apiFetch } from "@/lib/api";
+import { apiFetch, dispatchUnauthorized } from "@/lib/api";
 
 const FAQ_ITEMS = [
   {
@@ -83,6 +83,10 @@ function PricingContent() {
           }),
         });
         const data = await res.json();
+        if (res.status === 401) {
+          dispatchUnauthorized();
+          return;
+        }
         if (data.checkout_url) {
           window.location.href = data.checkout_url;
         } else {

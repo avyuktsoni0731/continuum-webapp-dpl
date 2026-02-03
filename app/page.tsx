@@ -9,6 +9,7 @@ import { Toaster } from "@/components/sonner";
 import { motion } from "framer-motion";
 import { useInView } from "framer-motion";
 import { useRef } from "react";
+import Link from "next/link";
 
 export default function LandingPage() {
   const ctaRef = useRef(null);
@@ -99,23 +100,15 @@ export default function LandingPage() {
               with Continuum.
             </p>
             <div className="w-full max-w-md">
-              <button
-                onClick={() => {
-                  const waitlistElement = document.getElementById("waitlist");
-                  if (waitlistElement) {
-                    waitlistElement.scrollIntoView({
-                      behavior: "smooth",
-                      block: "center",
-                    });
-                  }
-                }}
-                className="w-full py-4 px-8 bg-foreground text-background rounded-full font-serif text-2xl font-medium hover:scale-[1.02] transition-transform active:scale-95 shadow-2xl shadow-white/5"
+              <Link
+                href="/register"
+                className="w-full pt-4 py-4 px-8 bg-foreground text-background rounded-full font-serif text-2xl font-medium hover:scale-[1.02] transition-transform active:scale-95 shadow-2xl shadow-white/5"
               >
-                Reserve your spot
-              </button>
-              <p className="mt-4 text-xs text-muted-foreground/60 uppercase tracking-[0.2em]">
+                Get Started
+              </Link>
+              {/* <p className="mt-4 text-xs text-muted-foreground/60 uppercase tracking-[0.2em]">
                 Limited beta slots available each month
-              </p>
+              </p> */}
             </div>
           </motion.div>
         </div>

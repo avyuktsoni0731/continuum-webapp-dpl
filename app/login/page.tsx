@@ -160,7 +160,7 @@ function LoginForm() {
               Don&apos;t have an account?{" "}
               <Link
                 href={`/register?callbackUrl=${encodeURIComponent(callbackUrl)}`}
-                className="text-accent hover:text-accent/80 font-medium"
+                className="text-white hover:text-accent transition font-medium"
               >
                 Sign up
               </Link>

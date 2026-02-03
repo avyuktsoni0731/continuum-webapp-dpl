@@ -1,6 +1,7 @@
 "use client";
 
 import { useSession } from "next-auth/react";
+import { dispatchUnauthorized } from "@/lib/api";
 import { Navbar } from "@/components/navbar";
 import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
@@ -50,7 +51,7 @@ function SetupContent() {
 
   const fetchSetupStatus = async (id: string) => {
     try {
-      const redirectUri = typeof window !== "undefined" 
+      const redirectUri = typeof window !== "undefined"
         ? encodeURIComponent(window.location.href)
         : "";
       const headers: HeadersInit = {};
@@ -63,6 +64,9 @@ function SetupContent() {
       );
 
       if (!res.ok) {
+        if (res.status === 401) {
+          dispatchUnauthorized();
+        }
         if (res.status === 404) {
           throw new Error("Workspace not found. Please install Continuum first.");
         }
@@ -351,11 +355,10 @@ function SetupContent() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-100px" }}
               transition={{ duration: 0.6, delay: 0.1 }}
-              className={`rounded-3xl border ${
-                status.integrations.jira.connected
+              className={`rounded-3xl border ${status.integrations.jira.connected
                   ? "border-green-500/50 bg-green-500/5"
                   : "border-border bg-card/50"
-              } p-10 space-y-6 group hover:border-accent/50 transition-colors`}
+                } p-10 space-y-6 group hover:border-accent/50 transition-colors`}
             >
               <div className="flex items-start justify-between">
                 <div className="w-16 h-16 bg-[#0052CC] rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
@@ -409,11 +412,10 @@ function SetupContent() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-100px" }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className={`rounded-3xl border ${
-                status.integrations.github.connected
+              className={`rounded-3xl border ${status.integrations.github.connected
                   ? "border-green-500/50 bg-green-500/5"
                   : "border-border bg-card/50"
-              } p-10 space-y-6 group hover:border-accent/50 transition-colors`}
+                } p-10 space-y-6 group hover:border-accent/50 transition-colors`}
             >
               <div className="flex items-start justify-between">
                 <div className="w-16 h-16 bg-[#202124] rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">

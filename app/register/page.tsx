@@ -193,7 +193,7 @@ function RegisterForm() {
               Already have an account?{" "}
               <Link
                 href={`/login?callbackUrl=${encodeURIComponent(callbackUrl)}`}
-                className="text-accent hover:text-accent/80 font-medium"
+                className="text-white hover:text-accent transition font-medium"
               >
                 Sign in
               </Link>

@@ -3,6 +3,13 @@
  * Sends Bearer token when provided for authenticated requests.
  */
 
+/** Dispatches event to trigger logout when backend returns 401 */
+export function dispatchUnauthorized() {
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new CustomEvent("continuum:unauthorized"));
+  }
+}
+
 const API_URL =
   process.env.API_URL ||
   process.env.NEXT_PUBLIC_API_URL ||
@@ -39,6 +46,9 @@ export async function apiFetch<T = unknown>(
   });
 
   if (!res.ok) {
+    if (res.status === 401) {
+      dispatchUnauthorized();
+    }
     const err = await res.json().catch(() => ({}));
     throw new ApiError(
       (err as { message?: string })?.message || `HTTP ${res.status}`,
