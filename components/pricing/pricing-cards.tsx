@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { PRICING_TIERS, type PricingTier } from "@/lib/pricing-data";
@@ -13,11 +12,6 @@ interface PricingCardsProps {
   onYearlyChange?: (yearly: boolean) => void;
   showToggle?: boolean;
   compact?: boolean;
-}
-
-function formatValue(val: boolean | string): React.ReactNode {
-  if (typeof val === "boolean") return val ? "✓" : "—";
-  return val;
 }
 
 export function PricingCards({
