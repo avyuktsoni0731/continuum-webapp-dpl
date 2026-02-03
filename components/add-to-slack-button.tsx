@@ -55,9 +55,8 @@ export function AddToSlackButton({ variant = "default", className = "" }: AddToS
       className={`inline-block group ${className}`}
     >
       <div
-        className={`flex items-center gap-4 px-8 py-5 bg-[#4A154B] hover:bg-[#5A1B5B] text-white rounded-full font-medium transition-all hover:scale-[1.02] active:scale-95 shadow-2xl shadow-[#4A154B]/30 ${
-          isLarge ? "text-lg md:text-2xl py-6 px-12" : "text-lg"
-        }`}
+        className={`flex items-center gap-4 px-8 py-5 bg-[#4A154B] hover:bg-[#5A1B5B] text-white rounded-full font-medium transition-all hover:scale-[1.02] active:scale-95 shadow-2xl shadow-[#4A154B]/30 ${isLarge ? "text-lg md:text-2xl py-6 px-12" : "text-lg"
+          }`}
       >
         {loading ? (
           <Loader2 className="w-6 h-6 animate-spin" />
