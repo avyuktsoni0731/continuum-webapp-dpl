@@ -1,13 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense, useEffect } from "react";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Navbar } from "@/components/navbar";
 import { PricingCards } from "@/components/pricing/pricing-cards";
 import { FeatureComparisonTable } from "@/components/pricing/feature-comparison-table";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { FAQ } from "@/components/pricing/faq";
+import { Loader2, CheckCircle } from "lucide-react";
+import { apiFetch } from "@/lib/api";
 
 const FAQ_ITEMS = [
   {
@@ -32,8 +36,64 @@ const FAQ_ITEMS = [
   },
 ];
 
-export default function PricingPage() {
+function PricingContent() {
   const [yearly, setYearly] = useState(false);
+  const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
+  const [activeTier, setActiveTier] = useState<string | null>(null);
+  const { data: session, status } = useSession();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const success = searchParams.get("success");
+  const canceled = searchParams.get("canceled");
+
+  // Fetch subscription when logged in
+  useEffect(() => {
+    if (status !== "authenticated" || !session?.accessToken) return;
+    apiFetch<{ tier: string }>("/subscription", {}, session.accessToken)
+      .then((data) => setActiveTier(data.tier))
+      .catch(() => setActiveTier(null));
+  }, [session?.accessToken, status]);
+
+  const handleTierSelect = async (tierId: string, isContactSales: boolean) => {
+    if (isContactSales) {
+      window.location.href = "/#get-started";
+      return;
+    }
+    if (tierId === "free") {
+      if (status === "authenticated") {
+        router.push("/dashboard");
+      } else {
+        router.push("/register?callbackUrl=/dashboard");
+      }
+      return;
+    }
+    if (tierId === "starter" || tierId === "pro") {
+      if (status !== "authenticated" || !session?.accessToken) {
+        router.push(`/login?callbackUrl=${encodeURIComponent("/pricing")}`);
+        return;
+      }
+      setCheckoutLoading(tierId);
+      try {
+        const res = await fetch("/api/subscription/checkout", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            tier: tierId,
+            billing_interval: yearly ? "yearly" : "monthly",
+          }),
+        });
+        const data = await res.json();
+        if (data.checkout_url) {
+          window.location.href = data.checkout_url;
+        } else {
+          throw new Error(data.error || "Checkout failed");
+        }
+      } catch (err) {
+        console.error(err);
+        setCheckoutLoading(null);
+      }
+    }
+  };
 
   return (
     <main className="min-h-screen">
@@ -71,6 +131,35 @@ export default function PricingPage() {
         </div>
       </section>
 
+      {/* Success / Canceled banners */}
+      {success === "true" && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="max-w-2xl mx-auto px-4 mb-4"
+        >
+          <div className="rounded-xl border border-green-500/30 bg-green-500/10 p-4 flex items-center gap-3">
+            <CheckCircle className="w-5 h-5 text-green-500 shrink-0" />
+            <p className="text-green-500 font-medium">
+              Payment successful! Your subscription is now active.
+            </p>
+          </div>
+        </motion.div>
+      )}
+      {canceled === "true" && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="max-w-2xl mx-auto px-4 mb-4"
+        >
+          <div className="rounded-xl border border-border bg-card/50 p-4">
+            <p className="text-muted-foreground">
+              Checkout was canceled. You can try again whenever you&apos;re ready.
+            </p>
+          </div>
+        </motion.div>
+      )}
+
       {/* Pricing Cards */}
       <section className="py-12 px-4">
         <div className="max-w-6xl mx-auto">
@@ -79,7 +168,15 @@ export default function PricingPage() {
             onYearlyChange={setYearly}
             showToggle={true}
             compact={false}
+            onTierSelect={checkoutLoading ? undefined : handleTierSelect}
+            activeTier={activeTier}
           />
+          {checkoutLoading && (
+            <div className="flex justify-center mt-4 gap-2 text-sm text-muted-foreground">
+              <Loader2 className="w-4 h-4 animate-spin" />
+              <span>Redirecting to checkout...</span>
+            </div>
+          )}
         </div>
       </section>
 
@@ -160,7 +257,7 @@ export default function PricingPage() {
             anything else.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/install">
+            <Link href="/register">
               <Button
                 size="lg"
                 className="rounded-full bg-foreground text-background hover:bg-foreground/90 px-8"
@@ -197,5 +294,20 @@ export default function PricingPage() {
         </div>
       </footer>
     </main>
+  );
+}
+
+export default function PricingPage() {
+  return (
+    <Suspense fallback={
+      <main className="min-h-screen">
+        <Navbar />
+        <section className="pt-32 pb-20 px-4 text-center text-muted-foreground">
+          Loading...
+        </section>
+      </main>
+    }>
+      <PricingContent />
+    </Suspense>
   );
 }

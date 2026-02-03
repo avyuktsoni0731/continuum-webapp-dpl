@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Geist, Fraunces } from "next/font/google";
 import "./globals.css";
 import { SmoothScrollProvider } from "@/components/smooth-scroll-provider";
+import { AuthSessionProvider } from "@/components/providers/session-provider";
 import { GoogleAnalytics } from "@/components/google-analytics";
 import { StructuredData } from "@/components/structured-data";
 
@@ -115,7 +116,9 @@ export default function RootLayout({
       <body className="font-sans antialiased bg-background text-foreground">
         <StructuredData />
         <GoogleAnalytics />
-        <SmoothScrollProvider>{children}</SmoothScrollProvider>
+        <AuthSessionProvider>
+          <SmoothScrollProvider>{children}</SmoothScrollProvider>
+        </AuthSessionProvider>
       </body>
     </html>
   );

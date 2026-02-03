@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { PRICING_TIERS, type PricingTier } from "@/lib/pricing-data";
@@ -12,6 +13,10 @@ interface PricingCardsProps {
   onYearlyChange?: (yearly: boolean) => void;
   showToggle?: boolean;
   compact?: boolean;
+  /** When provided, used instead of default Link navigation */
+  onTierSelect?: (tierId: string, isContactSales: boolean) => void | Promise<void>;
+  /** User's current subscription tier - shows "Current plan" on matching card */
+  activeTier?: string | null;
 }
 
 export function PricingCards({
@@ -19,6 +24,8 @@ export function PricingCards({
   onYearlyChange,
   showToggle = true,
   compact = false,
+  onTierSelect,
+  activeTier,
 }: PricingCardsProps) {
   const tiers = compact ? PRICING_TIERS.filter((t) => t.id !== "enterprise") : PRICING_TIERS;
 
@@ -71,6 +78,8 @@ export function PricingCards({
             yearly={yearly}
             index={i}
             compact={compact}
+            onTierSelect={onTierSelect}
+            isActive={activeTier != null && tier.id === activeTier}
           />
         ))}
       </div>
@@ -83,11 +92,15 @@ function PricingCard({
   yearly,
   index,
   compact,
+  onTierSelect,
+  isActive,
 }: {
   tier: PricingTier;
   yearly: boolean;
   index: number;
   compact: boolean;
+  onTierSelect?: (tierId: string, isContactSales: boolean) => void | Promise<void>;
+  isActive?: boolean;
 }) {
   const isEnterprise = tier.id === "enterprise";
   const price =
@@ -98,6 +111,36 @@ function PricingCard({
         : tier.priceDisplay;
 
   const isContactCta = tier.cta.toLowerCase().includes("contact");
+
+  const handleClick = () => {
+    if (!isActive && onTierSelect) {
+      onTierSelect(tier.id, isContactCta);
+    }
+  };
+
+  const buttonContent = isActive ? (
+    <Button
+      variant="outline"
+      className="w-full rounded-full font-medium border-green-500/50 bg-green-500/10 text-green-500 hover:bg-green-500/20 cursor-default"
+      size="lg"
+      disabled
+    >
+      <Check className="w-4 h-4 mr-2" />
+      Current plan
+    </Button>
+  ) : (
+    <Button
+      className={cn(
+        "w-full rounded-full font-medium",
+        tier.highlighted
+          ? "bg-accent text-accent-foreground hover:bg-accent/90"
+          : "bg-foreground text-background hover:bg-foreground/90"
+      )}
+      size="lg"
+    >
+      {tier.cta}
+    </Button>
+  );
 
   return (
     <motion.div
@@ -133,24 +176,21 @@ function PricingCard({
           )}
         </div>
 
-        {!compact && (
-          <Link
-            href={isContactCta ? "/#get-started" : "/install"}
-            className="block"
-          >
-            <Button
-              className={cn(
-                "w-full rounded-full font-medium",
-                tier.highlighted
-                  ? "bg-accent text-accent-foreground hover:bg-accent/90"
-                  : "bg-foreground text-background hover:bg-foreground/90"
-              )}
-              size="lg"
+        {!compact &&
+          (isActive ? (
+            <div className="block w-full">{buttonContent}</div>
+          ) : onTierSelect ? (
+            <button onClick={handleClick} className="block w-full">
+              {buttonContent}
+            </button>
+          ) : (
+            <Link
+              href={isContactCta ? "/#get-started" : "/install"}
+              className="block"
             >
-              {tier.cta}
-            </Button>
-          </Link>
-        )}
+              {buttonContent}
+            </Link>
+          ))}
       </div>
     </motion.div>
   );
