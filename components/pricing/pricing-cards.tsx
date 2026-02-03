@@ -12,6 +12,8 @@ interface PricingCardsProps {
   onYearlyChange?: (yearly: boolean) => void;
   showToggle?: boolean;
   compact?: boolean;
+  /** When provided, used instead of default Link navigation */
+  onTierSelect?: (tierId: string, isContactSales: boolean) => void | Promise<void>;
 }
 
 export function PricingCards({
@@ -19,6 +21,7 @@ export function PricingCards({
   onYearlyChange,
   showToggle = true,
   compact = false,
+  onTierSelect,
 }: PricingCardsProps) {
   const tiers = compact ? PRICING_TIERS.filter((t) => t.id !== "enterprise") : PRICING_TIERS;
 
@@ -71,6 +74,7 @@ export function PricingCards({
             yearly={yearly}
             index={i}
             compact={compact}
+            onTierSelect={onTierSelect}
           />
         ))}
       </div>
@@ -83,11 +87,13 @@ function PricingCard({
   yearly,
   index,
   compact,
+  onTierSelect,
 }: {
   tier: PricingTier;
   yearly: boolean;
   index: number;
   compact: boolean;
+  onTierSelect?: (tierId: string, isContactSales: boolean) => void | Promise<void>;
 }) {
   const isEnterprise = tier.id === "enterprise";
   const price =
@@ -98,6 +104,26 @@ function PricingCard({
         : tier.priceDisplay;
 
   const isContactCta = tier.cta.toLowerCase().includes("contact");
+
+  const handleClick = () => {
+    if (onTierSelect) {
+      onTierSelect(tier.id, isContactCta);
+    }
+  };
+
+  const buttonContent = (
+    <Button
+      className={cn(
+        "w-full rounded-full font-medium",
+        tier.highlighted
+          ? "bg-accent text-accent-foreground hover:bg-accent/90"
+          : "bg-foreground text-background hover:bg-foreground/90"
+      )}
+      size="lg"
+    >
+      {tier.cta}
+    </Button>
+  );
 
   return (
     <motion.div
@@ -133,24 +159,19 @@ function PricingCard({
           )}
         </div>
 
-        {!compact && (
-          <Link
-            href={isContactCta ? "/#get-started" : "/install"}
-            className="block"
-          >
-            <Button
-              className={cn(
-                "w-full rounded-full font-medium",
-                tier.highlighted
-                  ? "bg-accent text-accent-foreground hover:bg-accent/90"
-                  : "bg-foreground text-background hover:bg-foreground/90"
-              )}
-              size="lg"
+        {!compact &&
+          (onTierSelect ? (
+            <button onClick={handleClick} className="block w-full">
+              {buttonContent}
+            </button>
+          ) : (
+            <Link
+              href={isContactCta ? "/#get-started" : "/install"}
+              className="block"
             >
-              {tier.cta}
-            </Button>
-          </Link>
-        )}
+              {buttonContent}
+            </Link>
+          ))}
       </div>
     </motion.div>
   );

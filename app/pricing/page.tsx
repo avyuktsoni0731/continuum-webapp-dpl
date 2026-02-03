@@ -2,12 +2,15 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Navbar } from "@/components/navbar";
 import { PricingCards } from "@/components/pricing/pricing-cards";
 import { FeatureComparisonTable } from "@/components/pricing/feature-comparison-table";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { FAQ } from "@/components/pricing/faq";
+import { Loader2, CheckCircle } from "lucide-react";
 
 const FAQ_ITEMS = [
   {
