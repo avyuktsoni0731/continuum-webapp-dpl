@@ -3,11 +3,14 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { useInView } from "framer-motion";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { PRICING_TIERS } from "@/lib/pricing-data";
 import { cn } from "@/lib/utils";
+import { apiFetch } from "@/lib/api";
+import { Check } from "lucide-react";
 
 /**
  * Compact pricing tiers section for the landing page
@@ -16,6 +19,15 @@ export function PricingTiers() {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
   const [yearly, setYearly] = useState(false);
+  const [activeTier, setActiveTier] = useState<string | null>(null);
+  const { data: session, status } = useSession();
+
+  useEffect(() => {
+    if (status !== "authenticated" || !session?.accessToken) return;
+    apiFetch<{ tier: string }>("/subscription", {}, session.accessToken)
+      .then((data) => setActiveTier(data.tier))
+      .catch(() => setActiveTier(null));
+  }, [session?.accessToken, status]);
 
   const tiers = PRICING_TIERS.filter((t) => t.id !== "enterprise");
 
@@ -132,19 +144,33 @@ export function PricingTiers() {
                     )}
                   </div>
 
-                  <Link href="/pricing" className="block pt-2">
-                    <Button
-                      variant="outline"
-                      className={cn(
-                        "w-full rounded-full font-medium",
-                        tier.highlighted &&
-                        "border-accent bg-accent/10 text-accent hover:bg-accent/20"
-                      )}
-                      size="sm"
-                    >
-                      View details
-                    </Button>
-                  </Link>
+                  {activeTier === tier.id ? (
+                    <div className="block pt-2">
+                      <Button
+                        variant="outline"
+                        className="w-full rounded-full font-medium border-green-500/50 bg-green-500/10 text-green-500 cursor-default"
+                        size="sm"
+                        disabled
+                      >
+                        <Check className="w-3 h-3 mr-1.5" />
+                        Current plan
+                      </Button>
+                    </div>
+                  ) : (
+                    <Link href="/pricing" className="block pt-2">
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          "w-full rounded-full font-medium",
+                          tier.highlighted &&
+                            "border-accent bg-accent/10 text-accent hover:bg-accent/20"
+                        )}
+                        size="sm"
+                      >
+                        View details
+                      </Button>
+                    </Link>
+                  )}
                 </div>
               </motion.div>
             );

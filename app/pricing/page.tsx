@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, Suspense } from "react";
+import { useState, Suspense, useEffect } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { FAQ } from "@/components/pricing/faq";
 import { Loader2, CheckCircle } from "lucide-react";
+import { apiFetch } from "@/lib/api";
 
 const FAQ_ITEMS = [
   {
@@ -38,11 +39,20 @@ const FAQ_ITEMS = [
 function PricingContent() {
   const [yearly, setYearly] = useState(false);
   const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
+  const [activeTier, setActiveTier] = useState<string | null>(null);
   const { data: session, status } = useSession();
   const router = useRouter();
   const searchParams = useSearchParams();
   const success = searchParams.get("success");
   const canceled = searchParams.get("canceled");
+
+  // Fetch subscription when logged in
+  useEffect(() => {
+    if (status !== "authenticated" || !session?.accessToken) return;
+    apiFetch<{ tier: string }>("/subscription", {}, session.accessToken)
+      .then((data) => setActiveTier(data.tier))
+      .catch(() => setActiveTier(null));
+  }, [session?.accessToken, status]);
 
   const handleTierSelect = async (tierId: string, isContactSales: boolean) => {
     if (isContactSales) {
@@ -159,6 +169,7 @@ function PricingContent() {
             showToggle={true}
             compact={false}
             onTierSelect={checkoutLoading ? undefined : handleTierSelect}
+            activeTier={activeTier}
           />
           {checkoutLoading && (
             <div className="flex justify-center mt-4 gap-2 text-sm text-muted-foreground">
