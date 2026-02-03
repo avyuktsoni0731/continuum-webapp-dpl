@@ -1,7 +1,9 @@
 "use client";
-import { WaitlistForm } from "./waitlist-form";
+
+import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
+import { ArrowRight } from "lucide-react";
 
 export function Hero() {
   return (
@@ -48,6 +50,21 @@ export function Hero() {
           platforms your team already uses through natural language in Slack—with
           smart delegation, always-on context, and intelligent automation.
         </motion.p>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.65 }}
+          className="pt-2"
+        >
+          <Link
+            href="/install"
+            className="group inline-flex items-center gap-2 px-8 py-4 rounded-full bg-accent text-accent-foreground font-medium text-lg hover:bg-accent/90 transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-accent/25"
+          >
+            Get early access
+            <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-0.5" />
+          </Link>
+        </motion.div>
 
         {/* <motion.div
           initial={{ opacity: 0, y: 20 }}
