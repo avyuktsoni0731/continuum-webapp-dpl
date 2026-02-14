@@ -8,6 +8,7 @@ import * as Avatar from "@radix-ui/react-avatar";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { LayoutDashboard, LogOut } from "lucide-react";
+import Image from "next/image";
 
 const scrollToSection = (id: string) => {
   const element = document.getElementById(id);
@@ -30,14 +31,15 @@ export function Navbar() {
       initial={{ y: -100, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
-      className="fixed top-6 left-1/2 -translate-x-1/2 z-50 w-[90%] max-w-2xl"
+      className="fixed top-6 left-1/2 -translate-x-1/2 z-50 w-[90%] max-w-3xl"
     >
       <nav className="flex items-center justify-between px-6 py-2 bg-card/50 backdrop-blur-xl border border-border rounded-full shadow-2xl shadow-black/50">
-        <div className="flex items-center gap-8">
+        <div className="flex items-center gap-16">
           <Link
             href="/"
-            className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+            className="flex items-center hover:opacity-80 transition-opacity"
           >
+            <Image src="/Continuum_Logo.png" alt="Continuum" width={32} height={32} />
             <span className="font-serif text-lg font-bold tracking-tight">
               Continuum
             </span>
@@ -121,11 +123,11 @@ export function Navbar() {
                   >
                     {session?.user?.name
                       ? session.user.name
-                          .split(" ")
-                          .map((n) => n[0])
-                          .join("")
-                          .toUpperCase()
-                          .slice(0, 2)
+                        .split(" ")
+                        .map((n) => n[0])
+                        .join("")
+                        .toUpperCase()
+                        .slice(0, 2)
                       : session?.user?.email?.[0]?.toUpperCase() ?? "?"}
                   </Avatar.Fallback>
                 </Avatar.Root>
@@ -181,6 +183,6 @@ export function Navbar() {
           </div>
         )}
       </nav>
-    </motion.header>
+    </motion.header >
   );
 }
