@@ -62,10 +62,10 @@ export function UsageChart({ data, loading, height = 280 }: UsageChartProps) {
 
   return (
     <div
-      className="rounded-xl border border-border bg-card/30 p-4"
+      className="min-w-0 rounded-xl border border-border bg-card/30 p-3 sm:p-4"
       style={{ height: height + 32 }}
     >
-      <ResponsiveContainer width="100%" height={height}>
+      <ResponsiveContainer width="100%" height={height} minWidth={200}>
         <LineChart
           data={chartData}
           margin={{ top: 8, right: 8, left: 0, bottom: 0 }}

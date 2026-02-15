@@ -123,10 +123,10 @@ export default function DashboardIntegrationsPage() {
   }
 
   return (
-    <section className="p-8 pb-20">
-      <div className="max-w-4xl space-y-10">
+    <section className="pb-8">
+      <div className="max-w-4xl space-y-8 sm:space-y-10">
         <div>
-          <h1 className="font-serif text-3xl font-medium">Integrations</h1>
+          <h1 className="font-serif text-2xl font-medium sm:text-3xl">Integrations</h1>
           <p className="mt-2 text-muted-foreground">
             Connect your tools. Manage connections per workspace below.
           </p>
@@ -139,7 +139,7 @@ export default function DashboardIntegrationsPage() {
             {INTEGRATIONS.map(({ id, name, description, icon: Icon, connectLabel, isSlack }) => (
               <div
                 key={id}
-                className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4"
+                className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between sm:gap-4"
               >
                 <div className="flex items-start gap-4">
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-muted">

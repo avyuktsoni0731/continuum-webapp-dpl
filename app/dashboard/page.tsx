@@ -125,16 +125,16 @@ function DashboardContent() {
   }
 
   return (
-    <section className="p-8 pb-20">
-      <div className="max-w-4xl mx-auto space-y-12">
+    <section className="pb-8">
+      <div className="mx-auto max-w-4xl space-y-8 sm:space-y-10 md:space-y-12">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <h1 className="text-4xl md:text-6xl font-serif font-medium">
-            Dashboard
-          </h1>
+            <h1 className="font-serif text-3xl font-medium sm:text-4xl md:text-5xl lg:text-6xl">
+              Dashboard
+            </h1>
           <p className="text-muted-foreground mt-2">
             Manage your workspaces and connect Slack
           </p>
@@ -169,7 +169,7 @@ function DashboardContent() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1 }}
-          className="rounded-2xl border border-border bg-card/50 p-8"
+          className="rounded-xl border border-border bg-card/50 p-4 sm:p-6 md:p-8"
         >
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
             <div>
@@ -209,7 +209,7 @@ function DashboardContent() {
           {periodLabel && (
             <p className="text-sm text-muted-foreground mb-3">{periodLabel}</p>
           )}
-          <div className="mb-3 flex items-center gap-2">
+          <div className="mb-3 flex flex-wrap items-center gap-2">
             {([1, 7, 30] as const).map((d) => (
               <button
                 key={d}
@@ -240,9 +240,9 @@ function DashboardContent() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
         >
-          <h2 className="text-2xl font-serif font-medium mb-4">
-            Your workspaces
-          </h2>
+            <h2 className="font-serif text-xl font-medium mb-4 sm:text-2xl">
+              Your workspaces
+            </h2>
           {workspaces.length === 0 ? (
             <div className="rounded-2xl border border-dashed border-border bg-card/20 p-12 text-center">
               <Plus className="w-12 h-12 text-muted-foreground/50 mx-auto mb-4" />
@@ -297,23 +297,23 @@ function DashboardContent() {
           )}
         </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          className="flex gap-4"
-        >
-          <Link href="/pricing">
-            <Button variant="outline" className="rounded-full">
-              View plans
-            </Button>
-          </Link>
-          <Link href="/">
-            <Button variant="ghost" className="rounded-full">
-              Back to home
-            </Button>
-          </Link>
-        </motion.div>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            className="flex flex-wrap gap-3"
+          >
+            <Link href="/pricing">
+              <Button variant="outline" className="rounded-full">
+                View plans
+              </Button>
+            </Link>
+            <Link href="/">
+              <Button variant="ghost" className="rounded-full">
+                Back to home
+              </Button>
+            </Link>
+          </motion.div>
 
         {confirmError && (
           <motion.div

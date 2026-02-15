@@ -54,11 +54,11 @@ export default function DashboardBillingPage() {
   }
 
   return (
-    <section className="p-8 pb-20">
-      <div className="max-w-4xl space-y-10">
+    <section className="pb-8">
+      <div className="max-w-4xl space-y-8 sm:space-y-10">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="font-serif text-3xl font-medium">Billing & Invoices</h1>
+            <h1 className="font-serif text-2xl font-medium sm:text-3xl">Billing & Invoices</h1>
             <p className="mt-2 text-muted-foreground">
               Manage your subscription and view usage. Current plan:{" "}
               <span className="font-medium text-foreground capitalize">
@@ -76,8 +76,8 @@ export default function DashboardBillingPage() {
 
         {/* Included usage */}
         <div className="rounded-xl border border-border bg-card/30 overflow-hidden">
-          <div className="border-b border-border px-4 py-3">
-            <h2 className="font-medium">Included usage</h2>
+          <div className="border-b border-border px-3 py-3 sm:px-4">
+            <h2 className="font-medium text-sm sm:text-base">Included usage</h2>
             {periodLabel && (
               <p className="text-sm text-muted-foreground">{periodLabel}</p>
             )}
@@ -86,9 +86,9 @@ export default function DashboardBillingPage() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border text-left text-muted-foreground">
-                  <th className="px-4 py-3 font-medium">Item</th>
-                  <th className="px-4 py-3 font-medium text-right">Used</th>
-                  <th className="px-4 py-3 font-medium text-right">Limit</th>
+                  <th className="px-3 py-2 text-xs font-medium sm:px-4 sm:py-3 sm:text-sm">Item</th>
+                  <th className="px-3 py-2 text-right text-xs font-medium sm:px-4 sm:py-3 sm:text-sm">Used</th>
+                  <th className="px-3 py-2 text-right text-xs font-medium sm:px-4 sm:py-3 sm:text-sm">Limit</th>
                 </tr>
               </thead>
               <tbody>
@@ -96,7 +96,7 @@ export default function DashboardBillingPage() {
                   <tr>
                     <td
                       colSpan={3}
-                      className="px-4 py-6 text-center text-muted-foreground"
+                      className="px-3 py-6 text-center text-sm text-muted-foreground sm:px-4"
                     >
                       No usage data for this period
                     </td>
@@ -107,11 +107,11 @@ export default function DashboardBillingPage() {
                       key={label}
                       className="border-b border-border/50 last:border-0"
                     >
-                      <td className="px-4 py-3">{label}</td>
-                      <td className="px-4 py-3 text-right">
+                      <td className="px-3 py-2 text-xs sm:px-4 sm:py-3 sm:text-sm">{label}</td>
+                      <td className="px-3 py-2 text-right text-xs sm:px-4 sm:py-3 sm:text-sm">
                         {formatLimit(used)}
                       </td>
-                      <td className="px-4 py-3 text-right">
+                      <td className="px-3 py-2 text-right text-xs sm:px-4 sm:py-3 sm:text-sm">
                         {formatLimit(limit)}
                       </td>
                     </tr>

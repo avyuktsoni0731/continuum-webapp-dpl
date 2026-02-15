@@ -39,11 +39,11 @@ export default function DashboardUsagePage() {
   }
 
   return (
-    <section className="p-8 pb-20">
+    <section className="pb-8">
       <div className="max-w-4xl space-y-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="font-serif text-3xl font-medium">Usage</h1>
+            <h1 className="font-serif text-2xl font-medium sm:text-3xl">Usage</h1>
             <p className="mt-1 text-muted-foreground">
               View your usage history and export data.
             </p>
@@ -51,7 +51,7 @@ export default function DashboardUsagePage() {
               <p className="mt-1 text-sm text-muted-foreground">{periodLabel}</p>
             )}
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             {([1, 7, 30] as const).map((d) => (
               <button
                 key={d}
@@ -88,21 +88,21 @@ export default function DashboardUsagePage() {
 
         {/* Usage table */}
         <div className="rounded-xl border border-border bg-card/30 overflow-hidden">
-          <h2 className="border-b border-border px-4 py-3 font-medium">
+          <h2 className="border-b border-border px-3 py-3 font-medium text-sm sm:text-base sm:px-4">
             Usage history
           </h2>
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="w-full text-xs sm:text-sm">
               <thead>
                 <tr className="border-b border-border text-left text-muted-foreground">
-                  <th className="px-4 py-3 font-medium">Date</th>
-                  <th className="px-4 py-3 font-medium">Requests</th>
+                  <th className="px-3 py-2 font-medium sm:px-4 sm:py-3">Date</th>
+                  <th className="px-3 py-2 font-medium sm:px-4 sm:py-3">Requests</th>
                 </tr>
               </thead>
               <tbody>
                 {usageLoading ? (
                   <tr>
-                    <td colSpan={2} className="px-4 py-8 text-center text-muted-foreground">
+                    <td colSpan={2} className="px-3 py-8 text-center text-muted-foreground sm:px-4">
                       Loading…
                     </td>
                   </tr>
@@ -114,17 +114,17 @@ export default function DashboardUsagePage() {
                         key={date}
                         className="border-b border-border/50 last:border-0"
                       >
-                        <td className="px-4 py-3">
+                        <td className="px-3 py-2 sm:px-4 sm:py-3">
                           {format(parseISO(date), "MMM d, yyyy")}
                         </td>
-                        <td className="px-4 py-3">
+                        <td className="px-3 py-2 sm:px-4 sm:py-3">
                           {requests.toLocaleString()}
                         </td>
                       </tr>
                     ))
                 ) : (
                   <tr>
-                    <td colSpan={2} className="px-4 py-8 text-center text-muted-foreground">
+                    <td colSpan={2} className="px-3 py-8 text-center text-muted-foreground sm:px-4">
                       No usage in this period
                     </td>
                   </tr>
