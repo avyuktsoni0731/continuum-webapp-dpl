@@ -39,7 +39,7 @@ export function Navbar() {
             href="/"
             className="flex items-center hover:opacity-80 transition-opacity"
           >
-            <Image src="/Continuum_Logo.png" alt="Continuum" width={32} height={32} />
+            <Image src="/Continuum_Logo.png" alt="Continuum" width={40} height={40} />
             <span className="font-serif text-lg font-bold tracking-tight">
               Continuum
             </span>

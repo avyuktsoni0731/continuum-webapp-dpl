@@ -50,12 +50,14 @@ export function DashboardSidebar({
     <>
       {/* Continuum Logo + mobile close */}
       <div className="flex items-center justify-between border-b border-border p-4">
-        <div className="flex flex-row items-center">
-          <Image src="/Continuum_Logo.png" alt="Continuum" width={40} height={40} />
-          <span className="font-serif text-xl font-bold tracking-tight pl-1">
-            Continuum
-          </span>
-        </div>
+        <Link href="/">
+          <div className="flex flex-row items-center">
+            <Image src="/Continuum_Logo.png" alt="Continuum" width={40} height={40} />
+            <span className="font-serif text-xl font-bold tracking-tight pl-1">
+              Continuum
+            </span>
+          </div>
+        </Link>
         {onMobileClose && (
           <Button
             variant="ghost"
