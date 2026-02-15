@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { DashboardAccount } from "@/lib/types/dashboard";
+import Image from "next/image";
 
 const navItems = [
   { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
@@ -40,7 +41,16 @@ export function DashboardSidebar({
   };
 
   return (
-    <aside className="flex h-full w-[280px] shrink-0 flex-col border-r border-border bg-card/30">
+    <aside className="sticky top-0 flex h-screen min-h-0 w-[280px] shrink-0 flex-col border-r border-border bg-card/30">
+      {/* Continuum Logo */}
+      <div className="border-b border-border p-4 flex flex-row">
+        <Image src="/Continuum_Logo.png" alt="Continuum" width={40} height={40} />
+        <span className="font-serif text-xl font-bold tracking-tight flex items-center justify-center pl-1">
+          Continuum
+        </span>
+      </div>
+
+
       {/* User block */}
       <div className="border-b border-border p-4">
         {loading ? (

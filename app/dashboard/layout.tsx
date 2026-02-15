@@ -27,7 +27,7 @@ function DashboardLayoutContent({
     return (
       <div className="flex min-h-screen flex-col bg-background">
         <Navbar />
-        <div className="flex flex-1 items-center justify-center">
+        <div className="flex flex-1 items-center justify-center pt-24">
           <Loader2 className="h-10 w-10 animate-spin text-accent" />
         </div>
       </div>
@@ -41,9 +41,9 @@ function DashboardLayoutContent({
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <Navbar />
-      <div className="flex flex-1 min-h-0">
+      <div className="flex flex-1 min-h-0 h-screen">
         <DashboardSidebar account={account} loading={loading} />
-        <main className="flex-1 overflow-auto">
+        <main className="flex-1 overflow-auto min-h-0 pt-24">
           {children}
         </main>
       </div>
