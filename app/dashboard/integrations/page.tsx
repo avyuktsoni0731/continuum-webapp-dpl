@@ -95,6 +95,21 @@ export default function DashboardIntegrationsPage() {
   };
 
   const firstWorkspaceId = workspaces[0]?.id;
+
+  /** First workspace that has this integration enabled (for "Manage" link). */
+  const getWorkspaceForIntegration = (integrationId: string) => {
+    if (integrationId === "github") {
+      return workspaces.find((w) => w.integrations?.github);
+    }
+    if (integrationId === "jira") {
+      return workspaces.find((w) => w.integrations?.jira);
+    }
+    return undefined;
+  };
+
+  const isIntegrationConnected = (integrationId: string) =>
+    !!getWorkspaceForIntegration(integrationId);
+
   const teamMembersUsed = subscription?.usage?.team_members ?? 0;
   const teamMembersLimit = subscription?.limits?.team_members ?? 1;
   const atTeamLimit = teamMembersLimit > 0 && teamMembersUsed >= teamMembersLimit;
@@ -131,7 +146,14 @@ export default function DashboardIntegrationsPage() {
                     <Icon className="h-5 w-5 text-muted-foreground" />
                   </div>
                   <div>
-                    <h3 className="font-medium">{name}</h3>
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-medium">{name}</h3>
+                      {!isSlack && isIntegrationConnected(id) && (
+                        <Badge variant="secondary" className="text-xs font-normal">
+                          Connected
+                        </Badge>
+                      )}
+                    </div>
                     <p className="mt-0.5 text-sm text-muted-foreground">
                       {description}
                     </p>
@@ -154,20 +176,25 @@ export default function DashboardIntegrationsPage() {
                         </>
                       )}
                     </Button>
-                  ) : (
-                    <Link
-                      href={
-                        firstWorkspaceId
-                          ? `/setup?workspace_id=${firstWorkspaceId}`
-                          : "/dashboard"
-                      }
-                    >
-                      <Button size="sm" variant="outline" className="rounded-full">
-                        {workspaces.length === 0 ? "Add Slack first" : connectLabel}
-                        <ExternalLink className="ml-1.5 h-3.5 w-3.5" />
-                      </Button>
-                    </Link>
-                  )}
+                  ) : (() => {
+                    const connected = isIntegrationConnected(id);
+                    const targetWorkspace = getWorkspaceForIntegration(id) ?? workspaces[0];
+                    const setupHref = targetWorkspace
+                      ? `/setup?workspace_id=${targetWorkspace.id}`
+                      : "/dashboard";
+                    return (
+                      <Link href={setupHref}>
+                        <Button size="sm" variant="outline" className="rounded-full">
+                          {workspaces.length === 0
+                            ? "Add Slack first"
+                            : connected
+                              ? "Manage"
+                              : connectLabel}
+                          <ExternalLink className="ml-1.5 h-3.5 w-3.5" />
+                        </Button>
+                      </Link>
+                    );
+                  })()}
                 </div>
               </div>
             ))}
