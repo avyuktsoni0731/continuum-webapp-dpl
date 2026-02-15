@@ -163,7 +163,7 @@ export default function DashboardIntegrationsPage() {
                   {isSlack ? (
                     <Button
                       size="sm"
-                      className="rounded-full bg-[#4A154B] hover:bg-[#5A1B5B]"
+                      className="rounded-full bg-[#4A154B] hover:bg-[#5A1B5B] text-white/90"
                       onClick={handleAddToSlack}
                       disabled={addingSlack}
                     >

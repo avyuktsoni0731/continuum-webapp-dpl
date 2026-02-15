@@ -60,7 +60,7 @@ export default function DashboardUsagePage() {
                 className={cn(
                   "rounded-lg px-3 py-1.5 text-sm font-medium transition-colors",
                   days === d
-                    ? "bg-accent/15 text-accent"
+                    ? "bg-accent/15 text-white"
                     : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
                 )}
               >
