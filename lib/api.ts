@@ -10,16 +10,13 @@ export function dispatchUnauthorized() {
   }
 }
 
-const API_URL =
-  process.env.API_URL ||
-  process.env.NEXT_PUBLIC_API_URL ||
-  "http://localhost:8000";
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export class ApiError extends Error {
   constructor(
     message: string,
     public status?: number,
-    public data?: unknown
+    public data?: unknown,
   ) {
     super(message);
     this.name = "ApiError";
@@ -29,7 +26,7 @@ export class ApiError extends Error {
 export async function apiFetch<T = unknown>(
   path: string,
   options: RequestInit = {},
-  token?: string | null
+  token?: string | null,
 ): Promise<T> {
   const headers: HeadersInit = {
     "Content-Type": "application/json",
@@ -53,7 +50,7 @@ export async function apiFetch<T = unknown>(
     throw new ApiError(
       (err as { message?: string })?.message || `HTTP ${res.status}`,
       res.status,
-      err
+      err,
     );
   }
 

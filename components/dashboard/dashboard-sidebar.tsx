@@ -71,7 +71,7 @@ export function DashboardSidebar({
             className={cn(
               "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
               isActive(href)
-                ? "bg-accent/15 text-accent"
+                ? "bg-accent/15 text-white"
                 : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
             )}
           >
