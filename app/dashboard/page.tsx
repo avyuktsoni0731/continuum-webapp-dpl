@@ -18,6 +18,11 @@ import {
 } from "lucide-react";
 import { dispatchUnauthorized } from "@/lib/api";
 import { useDashboard } from "@/components/dashboard/dashboard-provider";
+import { PlanCards } from "@/components/dashboard/plan-cards";
+import { UsageChart } from "@/components/dashboard/usage-chart";
+import { useSubscriptionUsage, type UsageDays } from "@/components/dashboard/use-subscription-usage";
+import { cn } from "@/lib/utils";
+import { format, parseISO } from "date-fns";
 
 function DashboardContent() {
   const { data: session } = useSession();

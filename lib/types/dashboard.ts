@@ -50,3 +50,10 @@ export interface DashboardResponse {
   subscription: DashboardSubscription;
   workspaces: DashboardWorkspace[];
 }
+
+/** GET /subscription/usage?days=1|7|30 */
+export interface SubscriptionUsageResponse {
+  period_days: number;
+  daily: { date: string; requests: number }[];
+  total_requests: number;
+}
