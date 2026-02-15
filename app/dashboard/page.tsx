@@ -28,8 +28,17 @@ function DashboardContent() {
   const { data: session } = useSession();
   const searchParams = useSearchParams();
   const { account, subscription, workspaces, loading, refetch } = useDashboard();
+  const [usageDays, setUsageDays] = useState<UsageDays>(30);
+  const { data: usageData, loading: usageLoading } = useSubscriptionUsage(usageDays);
   const [addingSlack, setAddingSlack] = useState(false);
   const [confirmError, setConfirmError] = useState<string | null>(null);
+
+  const requestsToday = subscription?.usage?.requests_today ?? 0;
+  const requestsPerDay = subscription?.limits?.requests_per_day ?? 0;
+  const periodLabel =
+    subscription?.billing_period_start && subscription?.current_period_end
+      ? `${format(parseISO(subscription.billing_period_start), "MMM d")} – ${format(parseISO(subscription.current_period_end), "MMM d")}`
+      : null;
 
   useEffect(() => {
     const razorpay_payment_id = searchParams.get("razorpay_payment_id");
@@ -146,6 +155,15 @@ function DashboardContent() {
             )}
           </motion.div>
 
+          {/* Plan cards */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.05 }}
+          >
+            <PlanCards currentTier={subscription?.tier} />
+          </motion.div>
+
           {/* Add to Slack CTA */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -179,6 +197,41 @@ function DashboardContent() {
                 )}
               </Button>
             </div>
+          </motion.div>
+
+          {/* Your analytics */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.15 }}
+          >
+            <h2 className="font-serif text-xl font-medium mb-3">Your analytics</h2>
+            {periodLabel && (
+              <p className="text-sm text-muted-foreground mb-3">{periodLabel}</p>
+            )}
+            <div className="mb-3 flex items-center gap-2">
+              {([1, 7, 30] as const).map((d) => (
+                <button
+                  key={d}
+                  type="button"
+                  onClick={() => setUsageDays(d)}
+                  className={cn(
+                    "rounded-lg px-3 py-1.5 text-sm font-medium transition-colors",
+                    usageDays === d
+                      ? "bg-accent/15 text-accent"
+                      : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+                  )}
+                >
+                  {d}d
+                </button>
+              ))}
+            </div>
+            {requestsPerDay > 0 && (
+              <p className="text-sm text-muted-foreground mb-3">
+                Requests today: {requestsToday.toLocaleString()} / {requestsPerDay.toLocaleString()}
+              </p>
+            )}
+            <UsageChart data={usageData} loading={usageLoading} />
           </motion.div>
 
           {/* Workspaces list */}
