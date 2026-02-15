@@ -128,10 +128,9 @@ export function DashboardSidebar({
   );
 
   const asideClass = cn(
-    "flex h-screen min-h-0 w-[280px] shrink-0 flex-col border-r border-border bg-card/30 transition-transform duration-200 ease-out",
-    "md:sticky md:top-0",
-    "fixed inset-y-0 left-0 z-40 md:relative md:inset-auto",
-    mobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
+    "fixed inset-y-0 left-0 z-40 flex h-screen w-[280px] flex-col border-r border-border bg-card/30 transition-transform duration-200 ease-out",
+    "md:translate-x-0",
+    mobileOpen ? "translate-x-0" : "-translate-x-full"
   );
 
   return (
