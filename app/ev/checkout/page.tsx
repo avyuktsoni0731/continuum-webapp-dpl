@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Script from "next/script";
 import { useCallback, useEffect, useState } from "react";
@@ -31,7 +32,7 @@ interface RazorpayInstance {
   open: () => void;
 }
 
-export default function EvCheckoutPage() {
+function EvCheckoutContent() {
   const searchParams = useSearchParams();
   const [status, setStatus] = useState<"idle" | "loading" | "processing" | "success" | "failed">("idle");
   const [error, setError] = useState<string | null>(null);
@@ -265,5 +266,21 @@ export default function EvCheckoutPage() {
         </div>
       </main>
     </>
+  );
+}
+
+export default function EvCheckoutPage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="flex min-h-[60vh] flex-col items-center justify-center px-4">
+          <div className="text-center">
+            <p className="text-muted-foreground">Loading checkout…</p>
+          </div>
+        </main>
+      }
+    >
+      <EvCheckoutContent />
+    </Suspense>
   );
 }
