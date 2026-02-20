@@ -2,11 +2,23 @@ import { NextRequest, NextResponse } from "next/server";
 import Razorpay from "razorpay";
 
 const EV_PROXY_SECRET = process.env.EV_PROXY_SECRET;
-// Use only RAZORPAY_KEY_ID here (server-side). The key is returned in the response
-// so Vercera's frontend can open Razorpay; no need for NEXT_PUBLIC_ on Continuum for this proxy.
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://continuumworks.app";
 const RAZORPAY_KEY_ID = process.env.RAZORPAY_KEY_ID;
 
-function checkSecret(req: NextRequest): boolean {
+function isContinuumOrigin(req: NextRequest): boolean {
+  try {
+    const origin = req.headers.get("origin") || req.headers.get("referer") || "";
+    const siteHost = new URL(SITE_URL).hostname;
+    if (!origin) return false;
+    const originHost = new URL(origin).hostname;
+    return originHost === siteHost || originHost === "localhost";
+  } catch {
+    return false;
+  }
+}
+
+function isAuthorized(req: NextRequest): boolean {
+  if (isContinuumOrigin(req)) return true;
   if (!EV_PROXY_SECRET) return false;
   const header =
     req.headers.get("x-ev-secret") ||
@@ -15,7 +27,7 @@ function checkSecret(req: NextRequest): boolean {
 }
 
 export async function POST(req: NextRequest) {
-  if (!checkSecret(req)) {
+  if (!isAuthorized(req)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
