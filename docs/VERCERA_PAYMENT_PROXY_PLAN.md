@@ -125,3 +125,36 @@ So: **Vercera frontend** should call **Vercera’s own** `/api/razorpay/create-o
 | **Vercera** | (1) Change create-order and verify-payment to forward to Continuum with secret. (2) Add `/api/registration/confirm-paid` to receive callback and write to Firestore. |
 
 This keeps payment processing on Continuum’s approved domain and keeps all registration data and Firestore writes on Vercera.
+
+---
+
+## Continuum env (example)
+
+Add to `.env.local` or deployment:
+
+```env
+# Razorpay (Continuum’s approved account)
+RAZORPAY_KEY_ID=rzp_live_xxx
+RAZORPAY_KEY_SECRET=xxx
+NEXT_PUBLIC_RAZORPAY_KEY_ID=rzp_live_xxx
+
+# Proxy auth (shared with Vercera)
+EV_PROXY_SECRET=<generate-a-long-random-string>
+
+# Callback to Vercera after successful verify
+VERCERA_CALLBACK_URL=https://www.vercera.in/api/registration/confirm-paid
+VERCERA_CALLBACK_SECRET=<generate-another-long-random-string>
+```
+
+Vercera must set the same `EV_PROXY_SECRET` and `VERCERA_CALLBACK_SECRET` on their side.
+
+---
+
+## Vercera callback payload
+
+`POST /api/registration/confirm-paid` will receive:
+
+- **Header:** `X-Callback-Secret: <VERCERA_CALLBACK_SECRET>`
+- **Body:** `{ orderId, paymentId, eventId, eventName, amount, userId, team?, teamName?, memberEmails?, additionalInfo? }`
+
+Reuse the same Firestore write logic as in current `verify-payment` (solo + team registrations, duplicate checks, etc.); only omit Razorpay signature verification.
