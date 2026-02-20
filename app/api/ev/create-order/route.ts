@@ -2,8 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import Razorpay from "razorpay";
 
 const EV_PROXY_SECRET = process.env.EV_PROXY_SECRET;
-const RAZORPAY_KEY_ID =
-  process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || process.env.RAZORPAY_KEY_ID;
+// Use only RAZORPAY_KEY_ID here (server-side). The key is returned in the response
+// so Vercera's frontend can open Razorpay; no need for NEXT_PUBLIC_ on Continuum for this proxy.
+const RAZORPAY_KEY_ID = process.env.RAZORPAY_KEY_ID;
 
 function checkSecret(req: NextRequest): boolean {
   if (!EV_PROXY_SECRET) return false;
