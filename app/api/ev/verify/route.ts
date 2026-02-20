@@ -69,37 +69,42 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (VERCERA_CALLBACK_URL && VERCERA_CALLBACK_SECRET) {
-      const callbackPayload = {
-        orderId,
-        paymentId,
-        eventId,
-        eventName,
-        amount: Number(amount),
-        userId,
-        team: team || null,
-        teamName: teamName || null,
-        memberEmails: memberEmails || null,
-        additionalInfo: additionalInfo || null,
-      };
+    if (!VERCERA_CALLBACK_URL || !VERCERA_CALLBACK_SECRET) {
+      return NextResponse.json(
+        { error: "Callback not configured" },
+        { status: 503 }
+      );
+    }
 
-      const callbackRes = await fetch(VERCERA_CALLBACK_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-Callback-Secret": VERCERA_CALLBACK_SECRET,
-        },
-        body: JSON.stringify(callbackPayload),
-      });
+    const callbackPayload = {
+      orderId,
+      paymentId,
+      eventId,
+      eventName,
+      amount: Number(amount),
+      userId,
+      team: team || null,
+      teamName: teamName || null,
+      memberEmails: memberEmails || null,
+      additionalInfo: additionalInfo || null,
+    };
 
-      if (!callbackRes.ok) {
-        const errText = await callbackRes.text();
-        console.error("Vercera callback failed:", callbackRes.status, errText);
-        return NextResponse.json(
-          { error: "Registration callback failed" },
-          { status: 502 }
-        );
-      }
+    const callbackRes = await fetch(VERCERA_CALLBACK_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Callback-Secret": VERCERA_CALLBACK_SECRET,
+      },
+      body: JSON.stringify(callbackPayload),
+    });
+
+    if (!callbackRes.ok) {
+      const errText = await callbackRes.text();
+      console.error("Vercera callback failed:", callbackRes.status, errText);
+      return NextResponse.json(
+        { error: "Registration callback failed" },
+        { status: 502 }
+      );
     }
 
     return NextResponse.json({
