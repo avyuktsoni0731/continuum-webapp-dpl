@@ -2,11 +2,25 @@ import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 
 const EV_PROXY_SECRET = process.env.EV_PROXY_SECRET;
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://continuumworks.app";
 const RAZORPAY_KEY_SECRET = process.env.RAZORPAY_KEY_SECRET;
 const VERCERA_CALLBACK_URL = process.env.VERCERA_CALLBACK_URL;
 const VERCERA_CALLBACK_SECRET = process.env.VERCERA_CALLBACK_SECRET;
 
-function checkSecret(req: NextRequest): boolean {
+function isContinuumOrigin(req: NextRequest): boolean {
+  try {
+    const origin = req.headers.get("origin") || req.headers.get("referer") || "";
+    const siteHost = new URL(SITE_URL).hostname;
+    if (!origin) return false;
+    const originHost = new URL(origin).hostname;
+    return originHost === siteHost || originHost === "localhost";
+  } catch {
+    return false;
+  }
+}
+
+function isAuthorized(req: NextRequest): boolean {
+  if (isContinuumOrigin(req)) return true;
   if (!EV_PROXY_SECRET) return false;
   const header =
     req.headers.get("x-ev-secret") ||
@@ -15,7 +29,7 @@ function checkSecret(req: NextRequest): boolean {
 }
 
 export async function POST(req: NextRequest) {
-  if (!checkSecret(req)) {
+  if (!isAuthorized(req)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

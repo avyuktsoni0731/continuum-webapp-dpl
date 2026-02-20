@@ -26,12 +26,14 @@
 
 ## Proxy Flow (after implementation)
 
-1. **Vercera frontend** calls **Continuum** proxy to create order (with shared secret).
-2. **Continuum** creates Razorpay order with Continuum’s keys; returns `orderId`, `amount`, `currency`, and **Continuum’s** `keyId` for checkout.
-3. **Vercera frontend** opens Razorpay with Continuum’s `keyId` and returned `orderId`. User pays.
-4. **Vercera frontend** sends payment response to **Continuum** proxy verify endpoint (with same payload + shared secret).
-5. **Continuum** verifies signature with Continuum’s Razorpay secret; then **server-to-server** calls **Vercera** callback URL with a second secret and the same payload.
-6. **Vercera** new endpoint receives callback, validates callback secret, writes to Firestore (same logic as current verify-payment, no Razorpay check).
+Razorpay uses the **Originating URL** (the page domain where checkout is opened). So payment must be **opened on continuumworks.app**, not on vercera.in.
+
+1. User on **vercera.in** fills the event checkout form and clicks “Pay & Register”.
+2. **Vercera** redirects the browser to **continuumworks.app/ev/checkout?eventId=…&eventName=…&amount=…&userId=…&email=…&userName=…&returnUrl=…** (and optional `team`, `additionalInfo`). So the user is now on Continuum’s domain.
+3. **Continuum** `/ev/checkout` page loads, calls **Continuum’s** `/api/ev/create-order`, gets `orderId` and `keyId`, and opens the **Razorpay** modal. Originating URL is **continuumworks.app/ev/checkout** → Razorpay accepts.
+4. User pays in the Razorpay modal. Continuum’s page calls **Continuum’s** `/api/ev/verify` with the payment response; Continuum verifies with Razorpay, then **server-to-server** calls **Vercera** `VERCERA_CALLBACK_URL` with the same payload.
+5. **Vercera** callback writes the registration to Firestore.
+6. Continuum’s page redirects the user to **returnUrl** (e.g. vercera.in/dashboard?payment=success).
 
 ---
 
@@ -90,24 +92,16 @@ Use a single, non-obvious path prefix (e.g. `/api/ev/`) and require `EV_PROXY_SE
 - `EV_PROXY_SECRET` = same value as on Continuum (shared secret).
 - `VERCERA_CALLBACK_SECRET` = same value as `VERCERA_CALLBACK_SECRET` on Continuum (for callback auth).
 
-### 2. Checkout page changes
+### 2. Checkout page: redirect to Continuum
 
-- **Create order:**  
-  Instead of `fetch('/api/razorpay/create-order', ...)`  
-  use `fetch(\`${process.env.NEXT_PUBLIC_PAYMENT_PROXY_URL}/api/ev/create-order\`, { headers: { 'X-EV-Secret': process.env.EV_PROXY_SECRET }, ... })`.  
-  (Secret must be in a server-only env or passed via a small Vercera API route that forwards to Continuum with the secret.)
+- **No Razorpay on Vercera.** When the user clicks “Pay & Register”, **redirect** to Continuum’s checkout page with query params:
+  - **URL:** `https://www.continuumworks.app/ev/checkout?eventId=…&eventName=…&amount=…&userId=…&email=…&userName=…&returnUrl=…` (and optional `team` as base64 JSON, `additionalInfo`).
+- **returnUrl:** e.g. `https://www.vercera.in/dashboard?payment=success`.
+- **Env on Vercera:** `NEXT_PUBLIC_EV_CHECKOUT_URL=https://www.continuumworks.app` (no trailing slash). The checkout page builds the redirect URL from this.
 
-- **Razorpay checkout:**  
-  Use `keyId` from create-order response (Continuum’s key) and `order_id` from response `id`.
+This is already implemented: Vercera’s checkout form submits by redirecting to Continuum’s `/ev/checkout` with the above params.
 
-- **Verify:**  
-  Instead of `fetch('/api/razorpay/verify-payment', ...)`  
-  use proxy verify URL with `X-EV-Secret` and same body.  
-  (Again, secret should not be in client; use a Vercera API route that forwards to Continuum with the secret.)
-
-So: **Vercera frontend** should call **Vercera’s own** `/api/razorpay/create-order` and `/api/razorpay/verify-payment`; those routes are changed to **forward** to Continuum’s proxy (adding the secret server-side) and return the response. That way the secret never hits the client.
-
-### 3. New callback endpoint on Vercera
+### 3. Callback endpoint on Vercera
 
 - **Route:** `POST /api/registration/confirm-paid`  
 - **Auth:** Require header `X-Callback-Secret: VERCERA_CALLBACK_SECRET`.  
