@@ -17,6 +17,8 @@ interface PricingCardsProps {
   onTierSelect?: (tierId: string, isContactSales: boolean) => void | Promise<void>;
   /** User's current subscription tier - shows "Current plan" on matching card */
   activeTier?: string | null;
+  /** When provided, use these tiers instead of PRICING_TIERS (e.g. from API) */
+  tiers?: PricingTier[] | null;
 }
 
 export function PricingCards({
@@ -26,8 +28,10 @@ export function PricingCards({
   compact = false,
   onTierSelect,
   activeTier,
+  tiers: tiersProp,
 }: PricingCardsProps) {
-  const tiers = compact ? PRICING_TIERS.filter((t) => t.id !== "enterprise") : PRICING_TIERS;
+  const source = tiersProp ?? PRICING_TIERS;
+  const tiers = compact ? source.filter((t) => t.id !== "enterprise") : source;
 
   return (
     <div className="space-y-10">
@@ -107,7 +111,7 @@ function PricingCard({
     isEnterprise || tier.price === null
       ? tier.priceDisplay
       : yearly && tier.priceYearly != null
-        ? `$${tier.priceYearly.toFixed(2)}`
+        ? (tier.priceYearlyDisplay ?? tier.priceDisplay)
         : tier.priceDisplay;
 
   const isContactCta = tier.cta.toLowerCase().includes("contact");

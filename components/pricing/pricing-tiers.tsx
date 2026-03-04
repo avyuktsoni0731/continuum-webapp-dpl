@@ -7,7 +7,7 @@ import { useRef, useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { PRICING_TIERS } from "@/lib/pricing-data";
+import { PRICING_TIERS, fetchPlans, type PricingTier } from "@/lib/pricing-data";
 import { cn } from "@/lib/utils";
 import { apiFetch } from "@/lib/api";
 import { Check } from "lucide-react";
@@ -20,7 +20,14 @@ export function PricingTiers() {
   const isInView = useInView(ref, { once: true, margin: "-100px" });
   const [yearly, setYearly] = useState(false);
   const [activeTier, setActiveTier] = useState<string | null>(null);
+  const [tiers, setTiers] = useState<PricingTier[]>(() => PRICING_TIERS.filter((t) => t.id !== "enterprise"));
   const { data: session, status } = useSession();
+
+  useEffect(() => {
+    fetchPlans().then((api) => {
+      if (api?.length) setTiers(api.filter((t) => t.id !== "enterprise"));
+    });
+  }, []);
 
   useEffect(() => {
     if (status !== "authenticated" || !session?.accessToken) return;
@@ -29,7 +36,7 @@ export function PricingTiers() {
       .catch(() => setActiveTier(null));
   }, [session?.accessToken, status]);
 
-  const tiers = PRICING_TIERS.filter((t) => t.id !== "enterprise");
+  const tiersToShow = tiers;
 
   return (
     <section
@@ -97,13 +104,13 @@ export function PricingTiers() {
           transition={{ duration: 0.6, delay: 0.2 }}
           className="grid md:grid-cols-3 gap-6"
         >
-          {tiers.map((tier, i) => {
+          {tiersToShow.map((tier, i) => {
             const isEnterprise = tier.id === "enterprise";
             const price =
               isEnterprise || tier.price === null
                 ? tier.priceDisplay
                 : yearly && tier.priceYearly != null
-                  ? `$${tier.priceYearly.toFixed(2)}`
+                  ? (tier.priceYearlyDisplay ?? tier.priceDisplay)
                   : tier.priceDisplay;
 
             return (

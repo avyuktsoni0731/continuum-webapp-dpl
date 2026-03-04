@@ -1,6 +1,6 @@
 /**
- * Pricing data based on PRICING_PAGE_SPEC.md
- * Single source of truth for tiers and feature matrix
+ * Pricing data – synced with api.continuumworks.app/plans
+ * Static fallback matches API; use fetchPlans() for live data.
  */
 
 export type TierId = "free" | "starter" | "pro" | "enterprise";
@@ -19,14 +19,85 @@ export interface PricingTier {
   headline: string;
 }
 
+/** API plan tier shape from GET /plans */
+export interface ApiPlanTier {
+  id: string;
+  name: string;
+  price: number | null;
+  price_display: string;
+  price_yearly?: number;
+  period: string | null;
+  razorpay_plan_id_monthly?: string | null;
+  razorpay_plan_id_yearly?: string | null;
+  limits?: Record<string, number>;
+  features?: string[];
+  contact_sales?: boolean;
+}
+
+export interface ApiPlansResponse {
+  tiers: ApiPlanTier[];
+  annual_discount_percent?: number;
+}
+
+/** Fetch plans from API; returns null on failure. */
+export async function fetchPlans(): Promise<PricingTier[] | null> {
+  const base = typeof window !== "undefined" ? (process.env.NEXT_PUBLIC_API_URL || "https://api.continuumworks.app") : (process.env.NEXT_PUBLIC_API_URL || "https://api.continuumworks.app");
+  try {
+    const res = await fetch(`${base}/plans`);
+    if (!res.ok) return null;
+    const data = (await res.json()) as ApiPlansResponse;
+    if (!Array.isArray(data.tiers)) return null;
+    return data.tiers.map(mapApiTierToPricingTier).filter(Boolean) as PricingTier[];
+  } catch {
+    return null;
+  }
+}
+
+function mapApiTierToPricingTier(t: ApiPlanTier): PricingTier | null {
+  const id = t.id?.toLowerCase() as TierId | undefined;
+  if (!id || !["free", "starter", "pro", "enterprise"].includes(id)) return null;
+  const price = t.price ?? null;
+  const priceYearly = t.price_yearly ?? null;
+  return {
+    id,
+    name: t.name || t.id,
+    price,
+    priceYearly,
+    priceDisplay: t.price_display ?? (price != null ? `₹${price}` : "Contact us"),
+    priceYearlyDisplay: priceYearly != null ? `₹${priceYearly}` : undefined,
+    period: t.period ?? null,
+    cta: t.contact_sales ? "Contact sales" : "Get started",
+    highlighted: id === "pro",
+    description: getTierDescription(id, t),
+    headline: getTierHeadline(id),
+  };
+}
+
+function getTierDescription(id: TierId, t: ApiPlanTier): string {
+  if (id === "free") return "Everything you need to try Continuum. One workspace, core integrations.";
+  if (id === "starter") return "Remove limits. Multiple workspaces, more context, email support.";
+  if (id === "pro") return "Advanced AI delegation, analytics, unlimited usage, priority support.";
+  if (id === "enterprise") return "SSO, SLA, self-host, and custom integrations for large orgs.";
+  return "";
+}
+
+function getTierHeadline(id: TierId): string {
+  if (id === "free") return "Start building habits";
+  if (id === "starter") return "For growing teams";
+  if (id === "pro") return "For teams that move fast";
+  if (id === "enterprise") return "For organizations with strict requirements";
+  return "";
+}
+
+/** Static tiers matching api.continuumworks.app/plans (fallback when fetch fails) */
 export const PRICING_TIERS: PricingTier[] = [
   {
     id: "free",
     name: "Free",
     price: 0,
     priceYearly: 0,
-    priceDisplay: "$0",
-    priceYearlyDisplay: "$0",
+    priceDisplay: "₹0",
+    priceYearlyDisplay: "₹0",
     period: null,
     cta: "Get started",
     highlighted: false,
@@ -37,10 +108,10 @@ export const PRICING_TIERS: PricingTier[] = [
   {
     id: "starter",
     name: "Starter",
-    price: 8,
-    priceYearly: 6.67,
-    priceDisplay: "$8",
-    priceYearlyDisplay: "$6.67",
+    price: 649,
+    priceYearly: 541,
+    priceDisplay: "₹649",
+    priceYearlyDisplay: "₹541",
     period: "user/month",
     cta: "Get started",
     highlighted: false,
@@ -51,10 +122,10 @@ export const PRICING_TIERS: PricingTier[] = [
   {
     id: "pro",
     name: "Pro",
-    price: 14,
-    priceYearly: 11.67,
-    priceDisplay: "$14",
-    priceYearlyDisplay: "$11.67",
+    price: 1149,
+    priceYearly: 958,
+    priceDisplay: "₹1,149",
+    priceYearlyDisplay: "₹958",
     period: "user/month",
     cta: "Get started",
     highlighted: true,
@@ -151,7 +222,7 @@ export const FEATURE_MATRIX: FeatureCategory[] = [
       },
       {
         name: "Requests per day",
-        free: "50",
+        free: "7",
         starter: "500",
         pro: "Unlimited",
         enterprise: "Unlimited",
@@ -164,8 +235,15 @@ export const FEATURE_MATRIX: FeatureCategory[] = [
         enterprise: "100",
       },
       {
-        name: "Team members",
+        name: "Knowledge facts (team memory)",
         free: "5",
+        starter: "50",
+        pro: "Unlimited",
+        enterprise: "Unlimited",
+      },
+      {
+        name: "Team members",
+        free: "1",
         starter: "15",
         pro: "Unlimited",
         enterprise: "Unlimited",
@@ -174,13 +252,13 @@ export const FEATURE_MATRIX: FeatureCategory[] = [
         name: "Jira sites",
         free: "1",
         starter: "1",
-        pro: "1",
+        pro: "Unlimited",
         enterprise: "Custom",
       },
       {
-        name: "GitHub orgs/repos",
+        name: "GitHub orgs",
         free: "1",
-        starter: "3",
+        starter: "1",
         pro: "Unlimited",
         enterprise: "Unlimited",
       },
@@ -195,13 +273,6 @@ export const FEATURE_MATRIX: FeatureCategory[] = [
         starter: true,
         pro: true,
         enterprise: true,
-      },
-      {
-        name: "Knowledge facts (team memory)",
-        free: "5",
-        starter: "50",
-        pro: "Unlimited",
-        enterprise: "Unlimited",
       },
       {
         name: "Task history learning",

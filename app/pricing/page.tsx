@@ -12,6 +12,7 @@ import { motion } from "framer-motion";
 import { FAQ } from "@/components/pricing/faq";
 import { Loader2, CheckCircle } from "lucide-react";
 import { apiFetch, dispatchUnauthorized } from "@/lib/api";
+import { fetchPlans, type PricingTier } from "@/lib/pricing-data";
 
 const FAQ_ITEMS = [
   {
@@ -40,11 +41,16 @@ function PricingContent() {
   const [yearly, setYearly] = useState(false);
   const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
   const [activeTier, setActiveTier] = useState<string | null>(null);
+  const [tiers, setTiers] = useState<PricingTier[] | null>(null);
   const { data: session, status } = useSession();
   const router = useRouter();
   const searchParams = useSearchParams();
   const success = searchParams.get("success");
   const canceled = searchParams.get("canceled");
+
+  useEffect(() => {
+    fetchPlans().then((api) => setTiers(api ?? null));
+  }, []);
 
   // Fetch subscription when logged in
   useEffect(() => {
@@ -174,6 +180,7 @@ function PricingContent() {
             compact={false}
             onTierSelect={checkoutLoading ? undefined : handleTierSelect}
             activeTier={activeTier}
+            tiers={tiers}
           />
           {checkoutLoading && (
             <div className="flex justify-center mt-4 gap-2 text-sm text-muted-foreground">
