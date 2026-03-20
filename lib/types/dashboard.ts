@@ -146,3 +146,35 @@ export interface UnifiedOpsResponse {
   total: number;
   items: UnifiedOpsItem[];
 }
+
+export interface GithubOrg {
+  login: string;
+  name: string;
+}
+
+export interface GithubRepo {
+  full_name: string;
+  name: string;
+  private: boolean;
+}
+
+export interface GithubOpsConfigResponse {
+  workspace_id: string;
+  github_connected: boolean;
+  default_repo: string | null;
+}
+
+export interface GithubOrgsResponse {
+  workspace_id: string;
+  github_connected: boolean;
+  orgs: GithubOrg[];
+  error?: string | null;
+}
+
+export interface GithubReposResponse {
+  workspace_id: string;
+  github_connected: boolean;
+  org: string;
+  repos: GithubRepo[];
+  error?: string | null;
+}

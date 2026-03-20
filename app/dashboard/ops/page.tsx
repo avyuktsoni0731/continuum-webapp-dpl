@@ -11,7 +11,10 @@ import { cn } from "@/lib/utils";
 import type {
   BlockerLedgerResponse,
   DashboardIssueItem,
+  GithubOpsConfigResponse,
+  GithubOrgsResponse,
   GithubPrOpsResponse,
+  GithubReposResponse,
   IssueHealthResponse,
   OpsFeedResponse,
   UnifiedOpsResponse,
@@ -116,8 +119,8 @@ interface TeamMemberOption {
 export default function DashboardOpsPage() {
   const { data: session, status } = useSession();
   const { workspaces } = useDashboard();
-  const jiraWorkspaces = useMemo(
-    () => workspaces.filter((w) => w.integrations?.jira),
+  const opsWorkspaces = useMemo(
+    () => workspaces.filter((w) => w.integrations?.jira || w.integrations?.github),
     [workspaces]
   );
   const [workspaceId, setWorkspaceId] = useState<string | null>(null);
@@ -139,13 +142,19 @@ export default function DashboardOpsPage() {
   const [githubActing, setGithubActing] = useState(false);
   const [integrationFilter, setIntegrationFilter] = useState<"all" | "jira" | "github">("all");
   const [unifiedOps, setUnifiedOps] = useState<UnifiedOpsResponse | null>(null);
+  const [githubConfig, setGithubConfig] = useState<GithubOpsConfigResponse | null>(null);
+  const [githubOrgs, setGithubOrgs] = useState<GithubOrgsResponse["orgs"]>([]);
+  const [githubRepos, setGithubRepos] = useState<GithubReposResponse["repos"]>([]);
+  const [selectedOrg, setSelectedOrg] = useState("");
+  const [selectedRepo, setSelectedRepo] = useState("");
+  const [repoSaving, setRepoSaving] = useState(false);
 
   const loadData = async (targetWorkspaceId: string) => {
     if (status !== "authenticated" || !session?.accessToken || !targetWorkspaceId) return;
     setLoading(true);
     setError(null);
     try {
-      const [h, l, feed, gh, teamRes, unified] = await Promise.all([
+      const [h, l, feed, gh, teamRes, unified, ghCfg, ghOrgs] = await Promise.all([
         apiFetch<IssueHealthResponse>(
           `/dashboard/issue-health?workspace_id=${targetWorkspaceId}`,
           {},
@@ -176,6 +185,16 @@ export default function DashboardOpsPage() {
           {},
           session.accessToken
         ),
+        apiFetch<GithubOpsConfigResponse>(
+          `/dashboard/github/config?workspace_id=${targetWorkspaceId}`,
+          {},
+          session.accessToken
+        ),
+        apiFetch<GithubOrgsResponse>(
+          `/dashboard/github/orgs?workspace_id=${targetWorkspaceId}`,
+          {},
+          session.accessToken
+        ),
       ]);
       setHealth(h);
       setLedger(l);
@@ -183,6 +202,23 @@ export default function DashboardOpsPage() {
       setGithubOps(gh);
       setTeamMembers(teamRes.members || []);
       setUnifiedOps(unified);
+      setGithubConfig(ghCfg);
+      setGithubOrgs(ghOrgs.orgs || []);
+      const orgFromCfg = (ghCfg.default_repo || "").split("/")[0] || "";
+      const orgFallback = (ghOrgs.orgs || [])[0]?.login || "";
+      const resolvedOrg = orgFromCfg || orgFallback;
+      setSelectedOrg(resolvedOrg);
+      setSelectedRepo(ghCfg.default_repo || "");
+      if (resolvedOrg) {
+        const reposRes = await apiFetch<GithubReposResponse>(
+          `/dashboard/github/repos?workspace_id=${targetWorkspaceId}&org=${encodeURIComponent(resolvedOrg)}`,
+          {},
+          session.accessToken
+        );
+        setGithubRepos(reposRes.repos || []);
+      } else {
+        setGithubRepos([]);
+      }
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to load issue ops");
       setHealth(null);
@@ -191,16 +227,19 @@ export default function DashboardOpsPage() {
       setGithubOps(null);
       setTeamMembers([]);
       setUnifiedOps(null);
+      setGithubConfig(null);
+      setGithubOrgs([]);
+      setGithubRepos([]);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    if (!workspaceId && jiraWorkspaces.length > 0) {
-      setWorkspaceId(jiraWorkspaces[0].id);
+    if (!workspaceId && opsWorkspaces.length > 0) {
+      setWorkspaceId(opsWorkspaces[0].id);
     }
-  }, [jiraWorkspaces, workspaceId]);
+  }, [opsWorkspaces, workspaceId]);
 
   useEffect(() => {
     if (!workspaceId) return;
@@ -314,15 +353,51 @@ export default function DashboardOpsPage() {
     }
   };
 
+  const loadReposForOrg = async (orgLogin: string) => {
+    if (!workspaceId || !session?.accessToken || !orgLogin) return;
+    try {
+      const reposRes = await apiFetch<GithubReposResponse>(
+        `/dashboard/github/repos?workspace_id=${workspaceId}&org=${encodeURIComponent(orgLogin)}`,
+        {},
+        session.accessToken
+      );
+      setGithubRepos(reposRes.repos || []);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Failed to load repos");
+      setGithubRepos([]);
+    }
+  };
+
+  const saveGithubRepo = async () => {
+    if (!workspaceId || !session?.accessToken || !selectedRepo) return;
+    setRepoSaving(true);
+    setError(null);
+    try {
+      await apiFetch(
+        "/dashboard/github/config",
+        {
+          method: "POST",
+          body: JSON.stringify({ workspace_id: workspaceId, default_repo: selectedRepo }),
+        },
+        session.accessToken
+      );
+      await loadData(workspaceId);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Failed to save default repo");
+    } finally {
+      setRepoSaving(false);
+    }
+  };
+
   return (
     <section className="pb-8">
       <div className="max-w-5xl space-y-6">
         <div className="rounded-2xl border border-border/70 bg-card/30 p-5 sm:p-6">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
-            <h1 className="font-serif text-2xl font-medium sm:text-3xl">Issue Ops</h1>
+            <h1 className="font-serif text-2xl font-medium sm:text-3xl">Unified Ops</h1>
             <p className="mt-1 text-sm text-muted-foreground sm:text-base">
-              Shared Jira reality for blockers, ownership, and top attention items.
+              Unified command center across Jira and GitHub for blockers, ownership, and merge flow.
             </p>
             <div className="mt-3 inline-flex rounded-lg border border-border bg-card/40 p-1">
               <button
@@ -355,10 +430,10 @@ export default function DashboardOpsPage() {
                 onChange={(e) => setWorkspaceId(e.target.value || null)}
                 className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm sm:min-w-64"
               >
-                {jiraWorkspaces.length === 0 ? (
-                  <option value="">No Jira-connected workspace</option>
+                {opsWorkspaces.length === 0 ? (
+                  <option value="">No workspace with Jira/GitHub connected</option>
                 ) : (
-                  jiraWorkspaces.map((w) => (
+                  opsWorkspaces.map((w) => (
                     <option key={w.id} value={w.id}>
                       {w.slack_workspace_name}
                     </option>
@@ -528,6 +603,43 @@ export default function DashboardOpsPage() {
               <Badge className="border-border bg-card/40 text-muted-foreground">
                 {githubOps.items.length} PR events
               </Badge>
+            </div>
+            <div className="mb-4 grid gap-2 rounded-xl border border-border bg-card/40 p-3 md:grid-cols-3">
+              <select
+                value={selectedOrg}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setSelectedOrg(val);
+                  setSelectedRepo("");
+                  void loadReposForOrg(val);
+                }}
+                className="rounded-md border border-border bg-background px-3 py-2 text-sm"
+              >
+                <option value="">Select org</option>
+                {githubOrgs.map((o) => (
+                  <option key={o.login} value={o.login}>
+                    {o.name} ({o.login})
+                  </option>
+                ))}
+              </select>
+              <select
+                value={selectedRepo}
+                onChange={(e) => setSelectedRepo(e.target.value)}
+                className="rounded-md border border-border bg-background px-3 py-2 text-sm"
+              >
+                <option value="">Select repo</option>
+                {githubRepos.map((r) => (
+                  <option key={r.full_name} value={r.full_name}>
+                    {r.full_name}
+                  </option>
+                ))}
+              </select>
+              <Button onClick={saveGithubRepo} disabled={repoSaving || !selectedRepo}>
+                {repoSaving ? "Saving..." : "Set Default Repo"}
+              </Button>
+              <p className="text-xs text-muted-foreground md:col-span-3">
+                Current default: <span className="text-foreground">{githubConfig?.default_repo || "Not set"}</span>
+              </p>
             </div>
             {!githubOps.github_connected ? (
               <p className="text-sm text-muted-foreground">
