@@ -127,3 +127,22 @@ export interface GithubPrOpsResponse {
   items: GithubPrOpsItem[];
   error?: string;
 }
+
+export interface UnifiedOpsItem {
+  source: "jira" | "github";
+  id: string;
+  title: string;
+  subtitle: string;
+  url?: string | null;
+  rank: number;
+  stale_days: number;
+  raw?: Record<string, unknown>;
+}
+
+export interface UnifiedOpsResponse {
+  workspace_id: string;
+  workspace_name?: string;
+  integration: "all" | "jira" | "github";
+  total: number;
+  items: UnifiedOpsItem[];
+}

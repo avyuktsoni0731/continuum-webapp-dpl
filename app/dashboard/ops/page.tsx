@@ -14,6 +14,7 @@ import type {
   GithubPrOpsResponse,
   IssueHealthResponse,
   OpsFeedResponse,
+  UnifiedOpsResponse,
 } from "@/lib/types/dashboard";
 import { useEffect } from "react";
 
@@ -137,13 +138,14 @@ export default function DashboardOpsPage() {
   const [githubSelected, setGithubSelected] = useState("");
   const [githubActing, setGithubActing] = useState(false);
   const [integrationFilter, setIntegrationFilter] = useState<"all" | "jira" | "github">("all");
+  const [unifiedOps, setUnifiedOps] = useState<UnifiedOpsResponse | null>(null);
 
   const loadData = async (targetWorkspaceId: string) => {
     if (status !== "authenticated" || !session?.accessToken || !targetWorkspaceId) return;
     setLoading(true);
     setError(null);
     try {
-      const [h, l, feed, gh, teamRes] = await Promise.all([
+      const [h, l, feed, gh, teamRes, unified] = await Promise.all([
         apiFetch<IssueHealthResponse>(
           `/dashboard/issue-health?workspace_id=${targetWorkspaceId}`,
           {},
@@ -169,12 +171,18 @@ export default function DashboardOpsPage() {
           {},
           session.accessToken
         ),
+        apiFetch<UnifiedOpsResponse>(
+          `/dashboard/unified-ops?workspace_id=${targetWorkspaceId}&integration=${integrationFilter}`,
+          {},
+          session.accessToken
+        ),
       ]);
       setHealth(h);
       setLedger(l);
       setOpsFeed(feed);
       setGithubOps(gh);
       setTeamMembers(teamRes.members || []);
+      setUnifiedOps(unified);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to load issue ops");
       setHealth(null);
@@ -182,6 +190,7 @@ export default function DashboardOpsPage() {
       setOpsFeed(null);
       setGithubOps(null);
       setTeamMembers([]);
+      setUnifiedOps(null);
     } finally {
       setLoading(false);
     }
@@ -196,7 +205,7 @@ export default function DashboardOpsPage() {
   useEffect(() => {
     if (!workspaceId) return;
     void loadData(workspaceId);
-  }, [session?.accessToken, status, workspaceId]);
+  }, [session?.accessToken, status, workspaceId, integrationFilter]);
 
   const openAssignModal = (item: DashboardIssueItem) => {
     setAssignIssue(item);
@@ -244,44 +253,7 @@ export default function DashboardOpsPage() {
     [teamMembers]
   );
 
-  const unifiedActivity = useMemo(() => {
-    const jiraItems = (opsFeed?.items || []).map((item) => ({
-      source: "jira" as const,
-      key: item.key,
-      title: item.summary,
-      subtitle: `Event: ${item.event_type.replace("_", " ")} | Owner: ${item.assignee || "Unassigned"} | Status: ${item.status || "Unknown"}`,
-      url: item.url || undefined,
-      rank:
-        item.event_type === "blocked"
-          ? 0
-          : item.event_type === "unowned"
-            ? 1
-            : item.event_type === "high_priority"
-              ? 2
-              : 3,
-      staleDays: item.stale_days || 0,
-    }));
-    const ghItems = (githubOps?.items || []).map((item) => ({
-      source: "github" as const,
-      key: `${item.repo}#${item.number}`,
-      title: item.title,
-      subtitle: `Event: ${item.event_type.replace("_", " ")} | Author: ${item.author} | Reviewers: ${item.requested_reviewers.length || 0}`,
-      url: item.url || undefined,
-      rank:
-        item.event_type === "review_needed"
-          ? 0
-          : item.event_type === "unassigned"
-            ? 1
-            : 2,
-      staleDays: item.stale_days || 0,
-    }));
-    const merged = [...jiraItems, ...ghItems];
-    const filtered =
-      integrationFilter === "all"
-        ? merged
-        : merged.filter((x) => x.source === integrationFilter);
-    return filtered.sort((a, b) => a.rank - b.rank || b.staleDays - a.staleDays).slice(0, 15);
-  }, [opsFeed, githubOps, integrationFilter]);
+  const unifiedActivity = useMemo(() => (unifiedOps?.items || []).slice(0, 15), [unifiedOps]);
 
   const openGithubModal = (item: GithubPrOpsResponse["items"][number], type: "assign" | "review") => {
     setGithubActionItem(item);
@@ -425,16 +397,16 @@ export default function DashboardOpsPage() {
             ) : (
               <div className="space-y-2">
                 {unifiedActivity.map((item) => (
-                  <div key={`unified-${item.source}-${item.key}`} className="rounded-xl border border-border bg-card/40 p-3">
+                  <div key={`unified-${item.id}`} className="rounded-xl border border-border bg-card/40 p-3">
                     <div className="flex items-center justify-between gap-2">
                       <div className="min-w-0">
                         <p className="text-sm font-medium text-foreground">
                           {item.url ? (
                             <a href={item.url} target="_blank" rel="noreferrer" className="underline-offset-2 hover:underline">
-                              {item.key}
+                              {item.id}
                             </a>
                           ) : (
-                            item.key
+                            item.id
                           )}{" "}
                           - {item.title}
                         </p>
