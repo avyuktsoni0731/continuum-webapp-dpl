@@ -45,7 +45,7 @@ function PlanCard({
           </Badge>
         )}
       </div>
-      <p className="mt-1 text-2xl font-medium text-foreground">
+      <p className="mt-1 text-2xl font-serif font-medium text-foreground">
         {tier.priceDisplay}
         {tier.period && (
           <span className="text-sm font-normal text-muted-foreground">
