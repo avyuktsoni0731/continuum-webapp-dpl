@@ -57,3 +57,37 @@ export interface SubscriptionUsageResponse {
   daily: { date: string; requests: number }[];
   total_requests: number;
 }
+
+export interface DashboardIssueItem {
+  key: string;
+  summary: string;
+  status: string;
+  priority: string;
+  assignee: string;
+  labels: string[];
+  url?: string | null;
+  reason: string;
+}
+
+export interface IssueHealthResponse {
+  workspace_id: string;
+  workspace_name?: string;
+  jira_connected: boolean;
+  headline: string;
+  focus_count: number;
+  blockers_count: number;
+  high_priority_count: number;
+  ownership: { owned: number; unowned: number };
+  top_items: DashboardIssueItem[];
+  error?: string;
+}
+
+export interface BlockerLedgerResponse {
+  workspace_id: string;
+  workspace_name?: string;
+  jira_connected: boolean;
+  total: number;
+  needs_owner: DashboardIssueItem[];
+  assigned: DashboardIssueItem[];
+  error?: string;
+}

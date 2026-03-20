@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
   BarChart3,
+  ClipboardList,
   Plug,
   CreditCard,
   FileText,
@@ -19,6 +20,7 @@ import { Button } from "@/components/ui/button";
 
 const navItems = [
   { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
+  { href: "/dashboard/ops", label: "Issue Ops", icon: ClipboardList },
   { href: "/dashboard/usage", label: "Usage", icon: BarChart3 },
   { href: "/dashboard/integrations", label: "Integrations", icon: Plug },
   { href: "/dashboard/billing", label: "Billing & Invoices", icon: CreditCard },

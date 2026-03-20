@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 
 const EV_PROXY_SECRET = process.env.EV_PROXY_SECRET;
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://continuumworks.app";
+const SITE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL || "https://continuumworks.app";
 const RAZORPAY_KEY_SECRET = process.env.RAZORPAY_KEY_SECRET;
 const VERCERA_CALLBACK_URL = process.env.VERCERA_CALLBACK_URL;
 const VERCERA_CALLBACK_SECRET = process.env.VERCERA_CALLBACK_SECRET;
@@ -13,7 +14,8 @@ function normalizeHost(host: string): string {
 
 function isContinuumOrigin(req: NextRequest): boolean {
   try {
-    const origin = req.headers.get("origin") || req.headers.get("referer") || "";
+    const origin =
+      req.headers.get("origin") || req.headers.get("referer") || "";
     const siteHost = normalizeHost(new URL(SITE_URL).hostname);
     if (!origin) return false;
     const originHost = normalizeHost(new URL(origin).hostname);
@@ -40,7 +42,7 @@ export async function POST(req: NextRequest) {
   if (!RAZORPAY_KEY_SECRET) {
     return NextResponse.json(
       { error: "Payment not configured" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 
@@ -72,8 +74,11 @@ export async function POST(req: NextRequest) {
       (!hasEvent && !hasBundle)
     ) {
       return NextResponse.json(
-        { error: "Missing required fields (need orderId, paymentId, signature, amount, userId, and either eventId+eventName or bundleId+eventName)" },
-        { status: 400 }
+        {
+          error:
+            "Missing required fields (need orderId, paymentId, signature, amount, userId, and either eventId+eventName or bundleId+eventName)",
+        },
+        { status: 400 },
       );
     }
 
@@ -85,14 +90,14 @@ export async function POST(req: NextRequest) {
     if (expectedSignature !== signature) {
       return NextResponse.json(
         { error: "Invalid payment signature" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     if (!VERCERA_CALLBACK_URL || !VERCERA_CALLBACK_SECRET) {
       return NextResponse.json(
         { error: "Callback not configured" },
-        { status: 503 }
+        { status: 503 },
       );
     }
 
@@ -128,7 +133,7 @@ export async function POST(req: NextRequest) {
           callbackStatus: callbackRes.status,
           callbackError: errText.slice(0, 200),
         },
-        { status: 502 }
+        { status: 502 },
       );
     }
 
@@ -138,9 +143,6 @@ export async function POST(req: NextRequest) {
     });
   } catch (err) {
     console.error("EV verify error:", err);
-    return NextResponse.json(
-      { error: "Verification failed" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Verification failed" }, { status: 500 });
   }
 }
