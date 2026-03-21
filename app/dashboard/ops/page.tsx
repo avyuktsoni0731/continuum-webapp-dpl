@@ -103,7 +103,9 @@ function IssueRow({ item }: { item: DashboardIssueItem }) {
       <div className="mt-2 flex flex-wrap gap-1 text-[10px] text-muted-foreground">
         <span className="rounded bg-muted/40 px-1.5 py-0.5">Owner: {item.assignee || "Unassigned"}</span>
         {!!item.labels?.length && (
-          <span className="rounded bg-muted/40 px-1.5 py-0.5">Labels: {item.labels.join(", ")}</span>
+          <span className="min-w-0 max-w-full break-words rounded bg-muted/40 px-1.5 py-0.5">
+            Labels: {item.labels.join(", ")}
+          </span>
         )}
       </div>
       <p className="mt-1.5 line-clamp-2 text-[10px] leading-relaxed text-muted-foreground">
@@ -116,19 +118,19 @@ function IssueRow({ item }: { item: DashboardIssueItem }) {
 function MetaChips({ subtitle }: { subtitle: string }) {
   const chips = parseSubtitleChips(subtitle);
   if (chips.length === 0) {
-    return <p className="text-xs leading-relaxed text-muted-foreground">{subtitle}</p>;
+    return <p className="break-words text-xs leading-relaxed text-muted-foreground">{subtitle}</p>;
   }
   return (
-    <div className="flex flex-wrap gap-1.5">
+    <div className="flex min-w-0 flex-wrap gap-1.5">
       {chips.map((c) => (
         <span
           key={`${c.label}-${c.value}`}
-          className="inline-flex max-w-full items-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-2 py-1 text-[11px] shadow-sm"
+          className="inline-flex max-w-full min-w-0 items-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-2 py-1 text-[11px] shadow-sm"
         >
           <span className="shrink-0 text-[10px] font-medium uppercase tracking-wide text-violet-300/90">
             {c.label}
           </span>
-          <span className="min-w-0 truncate text-foreground/90">{c.value}</span>
+          <span className="min-w-0 break-words text-foreground/90">{c.value}</span>
         </span>
       ))}
     </div>
@@ -555,12 +557,12 @@ export default function DashboardOpsPage() {
   }, [opsBrief?.text]);
 
   return (
-    <section className="relative min-h-screen overflow-hidden pb-8">
+    <section className="relative min-h-screen min-w-0 overflow-x-hidden pb-8">
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_90%_60%_at_50%_-15%,rgba(99,102,241,0.14),transparent_55%),radial-gradient(ellipse_60%_40%_at_100%_0%,rgba(56,189,248,0.08),transparent)]"
       />
-      <div className="relative mx-auto max-w-7xl space-y-5 px-4 sm:px-6">
+      <div className="relative mx-auto min-w-0 max-w-7xl space-y-4 px-3 sm:space-y-5 sm:px-6">
         <div className="rounded-2xl border border-border/70 bg-card/50 p-4 shadow-xl shadow-black/25 ring-1 ring-white/5 backdrop-blur-sm sm:p-5">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
@@ -571,11 +573,11 @@ export default function DashboardOpsPage() {
               <p className="mt-1 max-w-2xl text-sm text-muted-foreground sm:text-base">
                 Blockers, ownership, and merge flow across Jira and GitHub—at a glance.
               </p>
-              <div className="mt-4 inline-flex rounded-xl border border-border/80 bg-muted/30 p-1">
+              <div className="mt-4 inline-flex max-w-full flex-wrap rounded-xl border border-border/80 bg-muted/30 p-1">
                 <button
                   type="button"
                   className={cn(
-                    "rounded-lg px-3 py-1.5 text-xs font-medium transition-colors",
+                    "min-h-[40px] min-w-[4.5rem] flex-1 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors sm:min-w-0 sm:flex-none",
                     integrationFilter === "all" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
                   )}
                   onClick={() => setIntegrationFilter("all")}
@@ -585,7 +587,7 @@ export default function DashboardOpsPage() {
                 <button
                   type="button"
                   className={cn(
-                    "rounded-lg px-3 py-1.5 text-xs font-medium transition-colors",
+                    "min-h-[40px] min-w-[4.5rem] flex-1 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors sm:min-w-0 sm:flex-none",
                     integrationFilter === "jira" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
                   )}
                   onClick={() => setIntegrationFilter("jira")}
@@ -595,7 +597,7 @@ export default function DashboardOpsPage() {
                 <button
                   type="button"
                   className={cn(
-                    "rounded-lg px-3 py-1.5 text-xs font-medium transition-colors",
+                    "min-h-[40px] min-w-[4.5rem] flex-1 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors sm:min-w-0 sm:flex-none",
                     integrationFilter === "github" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
                   )}
                   onClick={() => setIntegrationFilter("github")}
@@ -642,11 +644,11 @@ export default function DashboardOpsPage() {
           <>
             <div className="overflow-hidden rounded-2xl border border-indigo-500/20 bg-linear-to-br from-indigo-500/10 via-card/60 to-card/30 p-4 shadow-lg ring-1 ring-indigo-500/10 sm:p-5">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                <div className="flex items-center gap-2">
-                  <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-500/20 text-indigo-200">
+                <div className="flex min-w-0 items-center gap-2">
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-indigo-500/20 text-indigo-200">
                     <Sparkles className="h-4 w-4" />
                   </span>
-                  <div>
+                  <div className="min-w-0">
                     <h2 className="text-base font-semibold text-foreground">Continuum Ops Brief</h2>
                     <p className="text-xs text-muted-foreground">AI summary — plain language, no duplicate headings</p>
                   </div>
@@ -654,7 +656,7 @@ export default function DashboardOpsPage() {
                 <Button
                   size="sm"
                   variant="secondary"
-                  className="shrink-0 rounded-full"
+                  className="w-full shrink-0 rounded-full sm:w-auto"
                   onClick={refreshOpsBrief}
                   disabled={briefRefreshing || (opsBrief?.refresh_remaining ?? 0) <= 0}
                 >
@@ -663,9 +665,9 @@ export default function DashboardOpsPage() {
               </div>
               <ul className="mt-3 space-y-1.5 border-t border-border/50 pt-3 text-sm leading-relaxed text-foreground/90">
                 {briefDisplayLines.map((line, i) => (
-                  <li key={i} className="flex gap-2">
+                  <li key={i} className="flex min-w-0 gap-2">
                     <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-indigo-400/80" aria-hidden />
-                    <span>{line}</span>
+                    <span className="min-w-0 break-words">{line}</span>
                   </li>
                 ))}
               </ul>
@@ -675,7 +677,7 @@ export default function DashboardOpsPage() {
               </p>
             </div>
 
-            <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="grid grid-cols-1 gap-2 min-[420px]:grid-cols-2 lg:grid-cols-4">
               <div className="rounded-lg border border-red-500/25 bg-red-500/5 p-3 ring-1 ring-inset ring-red-500/10">
                 <p className="text-[11px] font-medium text-muted-foreground">Critical attention</p>
                 <p className="mt-0.5 text-xl font-bold tabular-nums text-red-300">{unifiedSummary?.kpis.critical ?? 0}</p>
@@ -694,23 +696,30 @@ export default function DashboardOpsPage() {
               </div>
             </div>
 
-            <div className="rounded-lg border border-border/80 bg-muted/20 px-3 py-2 text-sm text-muted-foreground">
+            <div className="rounded-lg border border-border/80 bg-muted/20 px-3 py-2 text-sm break-words text-muted-foreground">
               {unifiedSummary?.insight || "Unified command-center insight will appear here once data is available."}
             </div>
           </>
         )}
 
         {!loading && (
-          <div className={cn("grid gap-4 lg:gap-6", sidebarVisible ? "lg:grid-cols-12" : "lg:grid-cols-1")}>
-            <div className={cn("space-y-4", sidebarVisible ? "lg:col-span-8" : "lg:col-span-12")}>
+          <div
+            className={cn(
+              "grid min-w-0 gap-4 lg:gap-6",
+              sidebarVisible ? "lg:grid-cols-12" : "lg:grid-cols-1"
+            )}
+          >
+            <div className={cn("min-w-0 space-y-4", sidebarVisible ? "lg:col-span-8" : "lg:col-span-12")}>
               {topRiskItems.length > 0 && (
                 <div className="rounded-2xl border border-amber-500/20 bg-linear-to-br from-amber-500/5 to-card/40 p-4 shadow-lg ring-1 ring-amber-500/10">
-                  <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-                    <div>
-                      <h2 className="font-serif text-lg font-semibold text-foreground">Top risks</h2>
+                  <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:gap-2">
+                    <div className="min-w-0">
+                      <h2 className="font-serif text-base font-semibold text-foreground sm:text-lg">Top risks</h2>
                       <p className="text-xs text-muted-foreground">Highest-impact items for the current filter</p>
                     </div>
-                    <Badge className="border-amber-500/30 bg-amber-500/10 text-amber-100">{topRiskItems.length} prioritized</Badge>
+                    <Badge className="w-fit shrink-0 border-amber-500/30 bg-amber-500/10 text-amber-100">
+                      {topRiskItems.length} prioritized
+                    </Badge>
                   </div>
                   <div className="space-y-2">
                     {topRiskItems.slice(0, 5).map((item) => {
@@ -726,12 +735,12 @@ export default function DashboardOpsPage() {
                                 <MetaChips subtitle={item.subtitle} />
                               </div>
                             </div>
-                            <div className="flex shrink-0 flex-wrap items-center gap-2">
+                            <div className="flex w-full shrink-0 flex-col gap-2 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center sm:justify-end">
                         {isJira && (
                           <Button
                             size="sm"
                             variant="outline"
-                            className="rounded-full"
+                            className="w-full rounded-full sm:w-auto"
                             onClick={() =>
                               openAssignModal({
                                 key: String(raw.key || item.id.replace(/^jira:/, "")),
@@ -753,7 +762,7 @@ export default function DashboardOpsPage() {
                             <Button
                               size="sm"
                               variant="outline"
-                              className="rounded-full"
+                              className="w-full rounded-full sm:w-auto"
                               onClick={() =>
                                 openGithubModal(
                                   {
@@ -780,7 +789,7 @@ export default function DashboardOpsPage() {
                             <Button
                               size="sm"
                               variant="outline"
-                              className="rounded-full"
+                              className="w-full rounded-full sm:w-auto"
                               onClick={() =>
                                 openGithubModal(
                                   {
@@ -816,12 +825,12 @@ export default function DashboardOpsPage() {
               )}
 
               <div className="rounded-2xl border border-cyan-500/15 bg-card/40 p-4 shadow-xl shadow-black/10 ring-1 ring-cyan-500/10">
-                <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-                  <div>
+                <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+                  <div className="min-w-0">
                     <h2 className="font-serif text-lg font-semibold">Unified activity</h2>
                     <p className="text-xs text-muted-foreground">Ranked events across Jira and GitHub</p>
                   </div>
-                  <Badge className="border-cyan-500/30 bg-cyan-500/10 text-cyan-100">
+                  <Badge className="w-fit shrink-0 border-cyan-500/30 bg-cyan-500/10 text-cyan-100">
                     {unifiedActivity.length} ranked events
                   </Badge>
                 </div>
@@ -843,16 +852,16 @@ export default function DashboardOpsPage() {
 
               {githubOps && integrationFilter !== "jira" && (
                 <div className="rounded-2xl border border-violet-500/20 bg-linear-to-br from-violet-500/5 to-card/40 p-4 shadow-lg ring-1 ring-violet-500/10">
-                  <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-                    <div>
+                  <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+                    <div className="min-w-0">
                       <h2 className="font-serif text-lg font-semibold">GitHub PR ops</h2>
                       <p className="text-xs text-muted-foreground">Pull requests needing attention</p>
                     </div>
-                    <Badge className="border-violet-500/30 bg-violet-500/10 text-violet-100">
+                    <Badge className="w-fit shrink-0 border-violet-500/30 bg-violet-500/10 text-violet-100">
                       {githubOps.items.length} PR events
                     </Badge>
                   </div>
-                  <div className="mb-4 grid gap-2 rounded-xl border border-border/80 bg-card/40 p-3 md:grid-cols-3">
+                  <div className="mb-4 grid grid-cols-1 gap-2 rounded-xl border border-border/80 bg-card/40 p-3 sm:grid-cols-2 md:grid-cols-3">
                     <select
                       value={repoSource}
                       onChange={(e) => {
@@ -872,7 +881,7 @@ export default function DashboardOpsPage() {
                           void loadPersonalRepos();
                         }
                       }}
-                      className="rounded-md border border-border bg-background px-3 py-2 text-sm"
+                      className="min-w-0 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
                     >
                       <option value="org">Organization repos</option>
                       <option value="personal">Personal/all accessible repos</option>
@@ -886,7 +895,7 @@ export default function DashboardOpsPage() {
                         if (val) void loadReposForOrg(val);
                       }}
                       disabled={repoSource !== "org"}
-                      className="rounded-md border border-border bg-background px-3 py-2 text-sm"
+                      className="min-w-0 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
                     >
                       <option value="">{repoSource === "org" ? "Select org" : "Org not required"}</option>
                       {githubOrgs.map((o) => (
@@ -898,7 +907,7 @@ export default function DashboardOpsPage() {
                     <select
                       value={selectedRepo}
                       onChange={(e) => setSelectedRepo(e.target.value)}
-                      className="rounded-md border border-border bg-background px-3 py-2 text-sm"
+                      className="min-w-0 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
                     >
                       <option value="">Select repo</option>
                       {githubRepos.map((r) => (
@@ -907,14 +916,18 @@ export default function DashboardOpsPage() {
                         </option>
                       ))}
                     </select>
-                    <Button onClick={saveGithubRepo} disabled={repoSaving || !selectedRepo}>
+                    <Button
+                      onClick={saveGithubRepo}
+                      disabled={repoSaving || !selectedRepo}
+                      className="w-full min-h-[40px] sm:min-h-0 md:col-span-1 md:w-auto"
+                    >
                       {repoSaving ? "Saving..." : "Set Default Repo"}
                     </Button>
-                    <p className="text-xs text-muted-foreground md:col-span-3">
+                    <p className="text-xs text-muted-foreground sm:col-span-2 md:col-span-3">
                       Current default: <span className="text-foreground">{githubConfig?.default_repo || "Not set"}</span>
                     </p>
                     {repoSource === "org" && githubOrgs.length === 0 && (
-                      <p className="text-xs text-muted-foreground md:col-span-3">
+                      <p className="text-xs text-muted-foreground sm:col-span-2 md:col-span-3">
                         No orgs visible for this token. Switch to Personal/all accessible repos or reconnect GitHub with org access.
                       </p>
                     )}
@@ -946,7 +959,7 @@ export default function DashboardOpsPage() {
                                   <span className="font-semibold text-violet-200">#{item.number}</span>
                                 )}
                                 <span
-                                  className="max-w-[min(100%,220px)] truncate font-mono text-xs text-muted-foreground"
+                                  className="min-w-0 max-w-full break-all font-mono text-xs text-muted-foreground sm:max-w-[min(100%,220px)] sm:truncate"
                                   title={item.repo}
                                 >
                                   {shortRepoLabel(item.repo)}
@@ -957,11 +970,21 @@ export default function DashboardOpsPage() {
                                 <MetaChips subtitle={githubPrMetaLine(item)} />
                               </div>
                             </div>
-                            <div className="flex shrink-0 gap-2">
-                              <Button size="sm" variant="outline" className="rounded-full" onClick={() => openGithubModal(item, "review")}>
+                            <div className="flex w-full shrink-0 flex-col gap-2 sm:w-auto sm:flex-row sm:flex-wrap">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="w-full rounded-full sm:w-auto"
+                                onClick={() => openGithubModal(item, "review")}
+                              >
                                 Request review
                               </Button>
-                              <Button size="sm" variant="outline" className="rounded-full" onClick={() => openGithubModal(item, "assign")}>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="w-full rounded-full sm:w-auto"
+                                onClick={() => openGithubModal(item, "assign")}
+                              >
                                 Assign PR
                               </Button>
                             </div>
@@ -976,13 +999,14 @@ export default function DashboardOpsPage() {
             </div>
 
             {sidebarVisible && (
-              <aside className="space-y-4 lg:col-span-4 lg:pr-1">
+              <aside className="min-w-0 space-y-4 lg:col-span-4 lg:pr-1">
                 {health && (
                   <div className="rounded-2xl border border-border/80 bg-card/40 p-4 shadow-sm">
-                    <div className="mb-3 flex items-center justify-between gap-2">
-                      <h2 className="font-serif text-lg font-semibold">Issue health</h2>
+                    <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
+                      <h2 className="min-w-0 shrink-0 font-serif text-lg font-semibold">Issue health</h2>
                       <Badge
                         className={cn(
+                          "w-fit max-w-full items-start justify-start gap-1 whitespace-normal text-left wrap-break-word sm:max-w-[min(100%,18rem)]",
                           "border",
                           health.headline.toLowerCase().includes("risk")
                             ? "border-orange-500/40 bg-orange-500/15 text-orange-300"
@@ -990,9 +1014,9 @@ export default function DashboardOpsPage() {
                         )}
                       >
                         {health.headline.toLowerCase().includes("risk") ? (
-                          <ShieldAlert className="mr-1 h-3.5 w-3.5" />
+                          <ShieldAlert className="mr-1 h-3.5 w-3.5 shrink-0" />
                         ) : (
-                          <CheckCircle2 className="mr-1 h-3.5 w-3.5" />
+                          <CheckCircle2 className="mr-1 h-3.5 w-3.5 shrink-0" />
                         )}
                         {health.headline}
                       </Badge>
@@ -1045,9 +1069,9 @@ export default function DashboardOpsPage() {
 
                 {opsFeed && (
                   <div className="rounded-2xl border border-border/80 bg-card/40 p-4 shadow-sm">
-                    <div className="mb-3 flex items-center justify-between">
-                      <h2 className="font-serif text-lg font-semibold">Ops feed</h2>
-                      <Badge className="border-border bg-card/40 text-muted-foreground">
+                    <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                      <h2 className="min-w-0 font-serif text-lg font-semibold">Ops feed</h2>
+                      <Badge className="w-fit shrink-0 border-border bg-card/40 text-muted-foreground">
                         {opsFeed.items.length} attention events
                       </Badge>
                     </div>
@@ -1065,7 +1089,7 @@ export default function DashboardOpsPage() {
                             <div key={`feed-${item.key}-${item.event_type}`} className="rounded-lg border border-border/60 bg-card/40 p-2.5">
                               <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                                 <div className="min-w-0">
-                                  <p className="text-sm font-medium text-foreground">
+                                  <p className="break-words text-sm font-medium text-foreground">
                                     {item.key} — {item.summary}
                                   </p>
                                   <div className="mt-2">
@@ -1074,7 +1098,12 @@ export default function DashboardOpsPage() {
                                     />
                                   </div>
                                 </div>
-                                <Button size="sm" variant="outline" className="shrink-0 rounded-full" onClick={() => openAssignModal(item)}>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="w-full shrink-0 rounded-full sm:w-auto"
+                                  onClick={() => openAssignModal(item)}
+                                >
                                   Assign
                                 </Button>
                               </div>
@@ -1088,7 +1117,7 @@ export default function DashboardOpsPage() {
                           <div key={`feed-${item.key}-${item.event_type}`} className="rounded-lg border border-border/60 bg-card/40 p-2.5">
                             <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                               <div className="min-w-0">
-                                <p className="text-sm font-medium text-foreground">
+                                <p className="break-words text-sm font-medium text-foreground">
                                   {item.key} — {item.summary}
                                 </p>
                                 <div className="mt-2">
@@ -1097,7 +1126,12 @@ export default function DashboardOpsPage() {
                                   />
                                 </div>
                               </div>
-                              <Button size="sm" variant="outline" className="shrink-0 rounded-full" onClick={() => openAssignModal(item)}>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="w-full shrink-0 rounded-full sm:w-auto"
+                                onClick={() => openAssignModal(item)}
+                              >
                                 Assign
                               </Button>
                             </div>
@@ -1110,9 +1144,9 @@ export default function DashboardOpsPage() {
 
                 {ledger && (
                   <div className="rounded-2xl border border-red-500/15 bg-card/40 p-4 shadow-sm ring-1 ring-red-500/10">
-                    <div className="mb-3 flex items-center justify-between">
-                      <h2 className="font-serif text-lg font-semibold">Blocker ledger</h2>
-                      <Badge className="border-red-500/40 bg-red-500/15 text-red-300">
+                    <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                      <h2 className="min-w-0 font-serif text-lg font-semibold">Blocker ledger</h2>
+                      <Badge className="w-fit shrink-0 border-red-500/40 bg-red-500/15 text-red-300">
                         {ledger.total} active blockers
                       </Badge>
                     </div>
@@ -1177,8 +1211,8 @@ export default function DashboardOpsPage() {
         )}
 
         {assignIssue && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-            <div className="w-full max-w-md rounded-2xl border border-border bg-background p-5 shadow-xl">
+          <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 p-4 sm:items-center">
+            <div className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-2xl border border-border bg-background p-5 shadow-xl">
               <h3 className="text-base font-semibold">Confirm Assignment</h3>
               <p className="mt-1 text-sm text-muted-foreground">
                 Assign <span className="font-medium text-foreground">{assignIssue.key}</span> to:
@@ -1211,9 +1245,10 @@ export default function DashboardOpsPage() {
               <p className="mt-2 text-xs text-muted-foreground">
                 Team aliases are resolved on the backend before Jira update.
               </p>
-              <div className="mt-4 flex justify-end gap-2">
+              <div className="mt-4 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
                 <Button
                   variant="ghost"
+                  className="w-full sm:w-auto"
                   onClick={() => {
                     if (assigning) return;
                     setAssignIssue(null);
@@ -1223,7 +1258,7 @@ export default function DashboardOpsPage() {
                 >
                   Cancel
                 </Button>
-                <Button onClick={submitAssign} disabled={assigning}>
+                <Button className="w-full sm:w-auto" onClick={submitAssign} disabled={assigning}>
                   {assigning ? "Assigning..." : "Confirm"}
                 </Button>
               </div>
@@ -1232,8 +1267,8 @@ export default function DashboardOpsPage() {
         )}
 
         {githubActionItem && githubActionType && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-            <div className="w-full max-w-md rounded-2xl border border-border bg-background p-5 shadow-xl">
+          <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 p-4 sm:items-center">
+            <div className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-2xl border border-border bg-background p-5 shadow-xl">
               <h3 className="text-base font-semibold">
                 {githubActionType === "assign" ? "Assign PR" : "Request PR Review"}
               </h3>
@@ -1264,9 +1299,10 @@ export default function DashboardOpsPage() {
                   ))}
                 </select>
               )}
-              <div className="mt-4 flex justify-end gap-2">
+              <div className="mt-4 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
                 <Button
                   variant="ghost"
+                  className="w-full sm:w-auto"
                   onClick={() => {
                     if (githubActing) return;
                     setGithubActionItem(null);
@@ -1277,7 +1313,7 @@ export default function DashboardOpsPage() {
                 >
                   Cancel
                 </Button>
-                <Button onClick={submitGithubAction} disabled={githubActing}>
+                <Button className="w-full sm:w-auto" onClick={submitGithubAction} disabled={githubActing}>
                   {githubActing ? "Applying..." : "Confirm"}
                 </Button>
               </div>
