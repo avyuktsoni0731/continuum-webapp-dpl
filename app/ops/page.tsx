@@ -585,7 +585,7 @@ export default function DashboardOpsPage() {
   }, [opsBrief?.text]);
 
   return (
-    <section className="relative min-h-screen min-w-0 overflow-x-hidden pb-8">
+    <section className="relative min-h-screen min-w-0 overflow-x-hidden pb-8 pt-4">
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0"
@@ -1110,30 +1110,30 @@ export default function DashboardOpsPage() {
                         </summary>
                         <div className="border-t border-border/50 p-2 pt-2">
                           <OpsScrollList>
-                          {opsFeed.items.map((item) => (
-                            <div key={`feed-${item.key}-${item.event_type}`} className="rounded-lg border border-border/60 bg-card/40 p-2.5">
-                              <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-                                <div className="min-w-0">
-                                  <p className="break-words text-sm font-medium text-foreground">
-                                    {item.key} — {item.summary}
-                                  </p>
-                                  <div className="mt-2">
-                                    <MetaChips
-                                      subtitle={`Event: ${eventLabel(item.event_type)} | Owner: ${item.assignee || "Unassigned"} | Status: ${item.status || "Unknown"}`}
-                                    />
+                            {opsFeed.items.map((item) => (
+                              <div key={`feed-${item.key}-${item.event_type}`} className="rounded-lg border border-border/60 bg-card/40 p-2.5">
+                                <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                                  <div className="min-w-0">
+                                    <p className="break-words text-sm font-medium text-foreground">
+                                      {item.key} — {item.summary}
+                                    </p>
+                                    <div className="mt-2">
+                                      <MetaChips
+                                        subtitle={`Event: ${eventLabel(item.event_type)} | Owner: ${item.assignee || "Unassigned"} | Status: ${item.status || "Unknown"}`}
+                                      />
+                                    </div>
                                   </div>
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="w-full shrink-0 rounded-full sm:w-auto"
+                                    onClick={() => openAssignModal(item)}
+                                  >
+                                    Assign
+                                  </Button>
                                 </div>
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  className="w-full shrink-0 rounded-full sm:w-auto"
-                                  onClick={() => openAssignModal(item)}
-                                >
-                                  Assign
-                                </Button>
                               </div>
-                            </div>
-                          ))}
+                            ))}
                           </OpsScrollList>
                         </div>
                       </details>
