@@ -36,6 +36,33 @@ import {
   shortRepoLabel,
   splitBriefLines,
 } from "@/lib/ops-format";
+import Image from "next/image";
+
+/** Shows ~3 dense rows; remaining items scroll inside (keeps page height manageable). */
+function OpsScrollList({
+  children,
+  className,
+  variant = "default",
+}: {
+  children: React.ReactNode;
+  className?: string;
+  /** Taller rows (e.g. IssueRow + actions) — still ~3 visible. */
+  variant?: "default" | "tall";
+}) {
+  return (
+    <div
+      className={cn(
+        "min-h-0 space-y-2 overflow-y-auto overscroll-y-contain rounded-md pr-1 [-webkit-overflow-scrolling:touch]",
+        variant === "tall"
+          ? "max-h-[min(55vh,32rem)]"
+          : "max-h-[min(50vh,24rem)]",
+        className
+      )}
+    >
+      {children}
+    </div>
+  );
+}
 
 function isBlocked(item: DashboardIssueItem) {
   const labels = item.labels || [];
@@ -407,7 +434,7 @@ export default function DashboardOpsPage() {
     [teamMembers]
   );
 
-  const unifiedActivity = useMemo(() => (unifiedOps?.items || []).slice(0, 8), [unifiedOps]);
+  const unifiedActivity = useMemo(() => unifiedOps?.items || [], [unifiedOps]);
   const unifiedSummary = unifiedOps?.summary;
   const topRiskItems = useMemo(
     () =>
@@ -560,7 +587,7 @@ export default function DashboardOpsPage() {
     <section className="relative min-h-screen min-w-0 overflow-x-hidden pb-8">
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_90%_60%_at_50%_-15%,rgba(99,102,241,0.14),transparent_55%),radial-gradient(ellipse_60%_40%_at_100%_0%,rgba(56,189,248,0.08),transparent)]"
+        className="pointer-events-none absolute inset-0"
       />
       <div className="relative mx-auto min-w-0 max-w-7xl space-y-4 px-3 sm:space-y-5 sm:px-6">
         <div className="rounded-2xl border border-border/70 bg-card/50 p-4 shadow-xl shadow-black/25 ring-1 ring-white/5 backdrop-blur-sm sm:p-5">
@@ -644,14 +671,8 @@ export default function DashboardOpsPage() {
           <>
             <div className="overflow-hidden rounded-2xl border border-indigo-500/20 bg-linear-to-br from-indigo-500/10 via-card/60 to-card/30 p-4 shadow-lg ring-1 ring-indigo-500/10 sm:p-5">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                <div className="flex min-w-0 items-center gap-2">
-                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-indigo-500/20 text-indigo-200">
-                    <Sparkles className="h-4 w-4" />
-                  </span>
-                  <div className="min-w-0">
-                    <h2 className="text-base font-semibold text-foreground">Continuum Ops Brief</h2>
-                    <p className="text-xs text-muted-foreground">AI summary — plain language, no duplicate headings</p>
-                  </div>
+                <div className="flex min-w-0 items-center">
+                  <Image src="/Continuum_Ops_AI_Full_Logo_2.png" alt="Continuum Ops AI Logo" width={200} height={12} />
                 </div>
                 <Button
                   size="sm"
@@ -663,14 +684,16 @@ export default function DashboardOpsPage() {
                   {briefRefreshing ? "Refreshing…" : "Refresh"}
                 </Button>
               </div>
-              <ul className="mt-3 space-y-1.5 border-t border-border/50 pt-3 text-sm leading-relaxed text-foreground/90">
-                {briefDisplayLines.map((line, i) => (
-                  <li key={i} className="flex min-w-0 gap-2">
-                    <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-indigo-400/80" aria-hidden />
-                    <span className="min-w-0 break-words">{line}</span>
-                  </li>
-                ))}
-              </ul>
+              <OpsScrollList className="mt-3 space-y-0">
+                <ul className="space-y-1.5 border-t border-border/50 pt-3 text-sm leading-relaxed text-foreground/90">
+                  {briefDisplayLines.map((line, i) => (
+                    <li key={i} className="flex min-w-0 gap-2">
+                      <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-indigo-400/80" aria-hidden />
+                      <span className="min-w-0 break-words">{line}</span>
+                    </li>
+                  ))}
+                </ul>
+              </OpsScrollList>
               <p className="mt-4 text-xs text-muted-foreground">
                 Generated {opsBrief?.generated_at ? new Date(opsBrief.generated_at).toLocaleString() : "—"} · Refreshes left today:{" "}
                 <span className="font-medium text-foreground">{opsBrief?.refresh_remaining ?? 0}</span>
@@ -721,8 +744,8 @@ export default function DashboardOpsPage() {
                       {topRiskItems.length} prioritized
                     </Badge>
                   </div>
-                  <div className="space-y-2">
-                    {topRiskItems.slice(0, 5).map((item) => {
+                  <OpsScrollList>
+                    {topRiskItems.map((item) => {
                       const raw = (item.raw || {}) as Record<string, unknown>;
                       const isJira = item.source === "jira";
                       const isGithub = item.source === "github";
@@ -736,91 +759,91 @@ export default function DashboardOpsPage() {
                               </div>
                             </div>
                             <div className="flex w-full shrink-0 flex-col gap-2 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center sm:justify-end">
-                        {isJira && (
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="w-full rounded-full sm:w-auto"
-                            onClick={() =>
-                              openAssignModal({
-                                key: String(raw.key || item.id.replace(/^jira:/, "")),
-                                summary: String(raw.summary || item.title),
-                                status: String(raw.status || ""),
-                                priority: String(raw.priority || ""),
-                                assignee: String(raw.assignee || ""),
-                                labels: Array.isArray(raw.labels) ? (raw.labels as string[]) : [],
-                                url: typeof raw.url === "string" ? raw.url : item.url,
-                                reason: String(raw.reason || item.subtitle),
-                              })
-                            }
-                          >
-                            Assign
-                          </Button>
-                        )}
-                        {isGithub && (
-                          <>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              className="w-full rounded-full sm:w-auto"
-                              onClick={() =>
-                                openGithubModal(
-                                  {
-                                    repo: String(raw.repo || ""),
-                                    number: Number(raw.number || 0),
-                                    title: String(raw.title || item.title),
-                                    author: String(raw.author || "Unknown"),
-                                    url: typeof raw.url === "string" ? raw.url : item.url,
-                                    updated_at: typeof raw.updated_at === "string" ? raw.updated_at : null,
-                                    stale_days: Number(raw.stale_days || item.stale_days || 0),
-                                    assignees: Array.isArray(raw.assignees) ? (raw.assignees as string[]) : [],
-                                    requested_reviewers: Array.isArray(raw.requested_reviewers)
-                                      ? (raw.requested_reviewers as string[])
-                                      : [],
-                                    event_type:
-                                      (String(raw.event_type || "review_needed") as GithubPrOpsResponse["items"][number]["event_type"]),
-                                  },
-                                  "review"
-                                )
-                              }
-                            >
-                              Request review
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              className="w-full rounded-full sm:w-auto"
-                              onClick={() =>
-                                openGithubModal(
-                                  {
-                                    repo: String(raw.repo || ""),
-                                    number: Number(raw.number || 0),
-                                    title: String(raw.title || item.title),
-                                    author: String(raw.author || "Unknown"),
-                                    url: typeof raw.url === "string" ? raw.url : item.url,
-                                    updated_at: typeof raw.updated_at === "string" ? raw.updated_at : null,
-                                    stale_days: Number(raw.stale_days || item.stale_days || 0),
-                                    assignees: Array.isArray(raw.assignees) ? (raw.assignees as string[]) : [],
-                                    requested_reviewers: Array.isArray(raw.requested_reviewers)
-                                      ? (raw.requested_reviewers as string[])
-                                      : [],
-                                    event_type:
-                                      (String(raw.event_type || "unassigned") as GithubPrOpsResponse["items"][number]["event_type"]),
-                                  },
-                                  "assign"
-                                )
-                              }
-                            >
-                              Assign PR
-                            </Button>
-                          </>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-                  </div>
+                              {isJira && (
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="w-full rounded-full sm:w-auto"
+                                  onClick={() =>
+                                    openAssignModal({
+                                      key: String(raw.key || item.id.replace(/^jira:/, "")),
+                                      summary: String(raw.summary || item.title),
+                                      status: String(raw.status || ""),
+                                      priority: String(raw.priority || ""),
+                                      assignee: String(raw.assignee || ""),
+                                      labels: Array.isArray(raw.labels) ? (raw.labels as string[]) : [],
+                                      url: typeof raw.url === "string" ? raw.url : item.url,
+                                      reason: String(raw.reason || item.subtitle),
+                                    })
+                                  }
+                                >
+                                  Assign
+                                </Button>
+                              )}
+                              {isGithub && (
+                                <>
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="w-full rounded-full sm:w-auto"
+                                    onClick={() =>
+                                      openGithubModal(
+                                        {
+                                          repo: String(raw.repo || ""),
+                                          number: Number(raw.number || 0),
+                                          title: String(raw.title || item.title),
+                                          author: String(raw.author || "Unknown"),
+                                          url: typeof raw.url === "string" ? raw.url : item.url,
+                                          updated_at: typeof raw.updated_at === "string" ? raw.updated_at : null,
+                                          stale_days: Number(raw.stale_days || item.stale_days || 0),
+                                          assignees: Array.isArray(raw.assignees) ? (raw.assignees as string[]) : [],
+                                          requested_reviewers: Array.isArray(raw.requested_reviewers)
+                                            ? (raw.requested_reviewers as string[])
+                                            : [],
+                                          event_type:
+                                            (String(raw.event_type || "review_needed") as GithubPrOpsResponse["items"][number]["event_type"]),
+                                        },
+                                        "review"
+                                      )
+                                    }
+                                  >
+                                    Request review
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="w-full rounded-full sm:w-auto"
+                                    onClick={() =>
+                                      openGithubModal(
+                                        {
+                                          repo: String(raw.repo || ""),
+                                          number: Number(raw.number || 0),
+                                          title: String(raw.title || item.title),
+                                          author: String(raw.author || "Unknown"),
+                                          url: typeof raw.url === "string" ? raw.url : item.url,
+                                          updated_at: typeof raw.updated_at === "string" ? raw.updated_at : null,
+                                          stale_days: Number(raw.stale_days || item.stale_days || 0),
+                                          assignees: Array.isArray(raw.assignees) ? (raw.assignees as string[]) : [],
+                                          requested_reviewers: Array.isArray(raw.requested_reviewers)
+                                            ? (raw.requested_reviewers as string[])
+                                            : [],
+                                          event_type:
+                                            (String(raw.event_type || "unassigned") as GithubPrOpsResponse["items"][number]["event_type"]),
+                                        },
+                                        "assign"
+                                      )
+                                    }
+                                  >
+                                    Assign PR
+                                  </Button>
+                                </>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </OpsScrollList>
                 </div>
               )}
 
@@ -837,7 +860,7 @@ export default function DashboardOpsPage() {
                 {unifiedActivity.length === 0 ? (
                   <p className="text-sm text-muted-foreground">No events for current filter.</p>
                 ) : (
-                  <div className="space-y-2">
+                  <OpsScrollList>
                     {unifiedActivity.map((item) => (
                       <div key={`unified-${item.id}`} className="rounded-xl border border-border/80 bg-card/50 p-3">
                         <UnifiedRowHeading item={item} linkUrl={item.url} />
@@ -846,7 +869,7 @@ export default function DashboardOpsPage() {
                         </div>
                       </div>
                     ))}
-                  </div>
+                  </OpsScrollList>
                 )}
               </div>
 
@@ -939,8 +962,8 @@ export default function DashboardOpsPage() {
                   ) : githubOps.items.length === 0 ? (
                     <p className="text-sm text-muted-foreground">No PR attention events right now.</p>
                   ) : (
-                    <div className="space-y-2">
-                      {githubOps.items.slice(0, 6).map((item) => (
+                    <OpsScrollList>
+                      {githubOps.items.map((item) => (
                         <div key={`gh-${item.repo}-${item.number}`} className="rounded-xl border border-border/80 bg-card/50 p-3">
                           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                             <div className="min-w-0 flex-1">
@@ -991,7 +1014,7 @@ export default function DashboardOpsPage() {
                           </div>
                         </div>
                       ))}
-                    </div>
+                    </OpsScrollList>
                   )}
                 </div>
               )}
@@ -1047,8 +1070,8 @@ export default function DashboardOpsPage() {
                         </div>
                       </div>
                     </div>
-                    <div className="mt-3 space-y-2">
-                      {(health.top_items || []).slice(0, 5).map((item) => (
+                    <OpsScrollList variant="tall" className="mt-3">
+                      {(health.top_items || []).map((item) => (
                         <div key={item.key} className="space-y-1.5">
                           <IssueRow item={item} />
                           <div className="flex justify-end">
@@ -1063,7 +1086,7 @@ export default function DashboardOpsPage() {
                           </div>
                         </div>
                       ))}
-                    </div>
+                    </OpsScrollList>
                   </div>
                 )}
 
@@ -1084,8 +1107,9 @@ export default function DashboardOpsPage() {
                         <summary className="cursor-pointer list-none px-3 py-2 text-xs font-medium text-foreground marker:hidden [&::-webkit-details-marker]:hidden">
                           Attention events ({opsFeed.items.length}) — may overlap unified activity
                         </summary>
-                        <div className="space-y-2 border-t border-border/50 p-2 pt-2">
-                          {opsFeed.items.slice(0, 6).map((item) => (
+                        <div className="border-t border-border/50 p-2 pt-2">
+                          <OpsScrollList>
+                          {opsFeed.items.map((item) => (
                             <div key={`feed-${item.key}-${item.event_type}`} className="rounded-lg border border-border/60 bg-card/40 p-2.5">
                               <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                                 <div className="min-w-0">
@@ -1109,11 +1133,12 @@ export default function DashboardOpsPage() {
                               </div>
                             </div>
                           ))}
+                          </OpsScrollList>
                         </div>
                       </details>
                     ) : (
-                      <div className="space-y-2">
-                        {opsFeed.items.slice(0, 6).map((item) => (
+                      <OpsScrollList>
+                        {opsFeed.items.map((item) => (
                           <div key={`feed-${item.key}-${item.event_type}`} className="rounded-lg border border-border/60 bg-card/40 p-2.5">
                             <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                               <div className="min-w-0">
@@ -1137,7 +1162,7 @@ export default function DashboardOpsPage() {
                             </div>
                           </div>
                         ))}
-                      </div>
+                      </OpsScrollList>
                     )}
                   </div>
                 )}
@@ -1157,48 +1182,52 @@ export default function DashboardOpsPage() {
                       </div>
                     ) : (
                       <div className="grid gap-3 sm:grid-cols-2">
-                        <div className="space-y-2 rounded-xl border border-border bg-card/40 p-2.5">
+                        <div className="rounded-xl border border-border bg-card/40 p-2.5">
                           <h3 className="text-sm font-semibold">Needs owner</h3>
                           {(ledger.needs_owner || []).length === 0 ? (
-                            <p className="text-sm text-muted-foreground">No unassigned blockers.</p>
+                            <p className="mt-2 text-sm text-muted-foreground">No unassigned blockers.</p>
                           ) : (
-                            (ledger.needs_owner || []).map((item) => (
-                              <div key={`n-${item.key}`} className="space-y-2">
-                                <IssueRow item={item} />
-                                <div className="flex justify-end">
-                                  <Button
-                                    size="sm"
-                                    variant="outline"
-                                    className="rounded-full"
-                                    onClick={() => openAssignModal(item)}
-                                  >
-                                    Assign
-                                  </Button>
+                            <OpsScrollList variant="tall" className="mt-2">
+                              {(ledger.needs_owner || []).map((item) => (
+                                <div key={`n-${item.key}`} className="space-y-2">
+                                  <IssueRow item={item} />
+                                  <div className="flex justify-end">
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      className="rounded-full"
+                                      onClick={() => openAssignModal(item)}
+                                    >
+                                      Assign
+                                    </Button>
+                                  </div>
                                 </div>
-                              </div>
-                            ))
+                              ))}
+                            </OpsScrollList>
                           )}
                         </div>
-                        <div className="space-y-2 rounded-xl border border-border bg-card/40 p-2.5">
+                        <div className="rounded-xl border border-border bg-card/40 p-2.5">
                           <h3 className="text-sm font-semibold">Assigned blockers</h3>
                           {(ledger.assigned || []).length === 0 ? (
-                            <p className="text-sm text-muted-foreground">No assigned blockers.</p>
+                            <p className="mt-2 text-sm text-muted-foreground">No assigned blockers.</p>
                           ) : (
-                            (ledger.assigned || []).map((item) => (
-                              <div key={`a-${item.key}`} className="space-y-2">
-                                <IssueRow item={item} />
-                                <div className="flex justify-end">
-                                  <Button
-                                    size="sm"
-                                    variant="outline"
-                                    className="rounded-full"
-                                    onClick={() => openAssignModal(item)}
-                                  >
-                                    Reassign
-                                  </Button>
+                            <OpsScrollList variant="tall" className="mt-2">
+                              {(ledger.assigned || []).map((item) => (
+                                <div key={`a-${item.key}`} className="space-y-2">
+                                  <IssueRow item={item} />
+                                  <div className="flex justify-end">
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      className="rounded-full"
+                                      onClick={() => openAssignModal(item)}
+                                    >
+                                      Reassign
+                                    </Button>
+                                  </div>
                                 </div>
-                              </div>
-                            ))
+                              ))}
+                            </OpsScrollList>
                           )}
                         </div>
                       </div>
