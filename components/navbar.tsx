@@ -7,7 +7,7 @@ import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import * as Avatar from "@radix-ui/react-avatar";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import { LayoutDashboard, LogOut } from "lucide-react";
+import { LayoutDashboard, LogOut, Workflow } from "lucide-react";
 import Image from "next/image";
 
 const scrollToSection = (id: string) => {
@@ -146,6 +146,15 @@ export function Navbar() {
                   >
                     <LayoutDashboard className="h-4 w-4" />
                     Dashboard
+                  </Link>
+                </DropdownMenu.Item>
+                <DropdownMenu.Item asChild>
+                  <Link
+                    href="/ops"
+                    className="flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm outline-none hover:bg-cyan-500/15 focus:bg-cyan-500/15"
+                  >
+                    <Workflow className="h-4 w-4 text-cyan-300" />
+                    Continuum Ops
                   </Link>
                 </DropdownMenu.Item>
                 <DropdownMenu.Separator className="my-1 h-px bg-border" />
