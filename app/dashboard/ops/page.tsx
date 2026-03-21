@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSession } from "next-auth/react";
 import {
   AlertTriangle,
@@ -29,7 +29,6 @@ import type {
   UnifiedOpsItem,
   UnifiedOpsResponse,
 } from "@/lib/types/dashboard";
-import { useEffect } from "react";
 import {
   eventLabel,
   parseSubtitleChips,
@@ -63,52 +62,53 @@ function statusTone(status: string, blocked: boolean) {
 
 function IssueRow({ item }: { item: DashboardIssueItem }) {
   const blocked = isBlocked(item);
+  const statusText = item.status || "Unknown";
+  /** Avoid duplicate “Blocked” when status already reads blocked */
+  const showBlockedChip = blocked && !/blocked/i.test(statusText);
   return (
     <div
       className={cn(
-        "rounded-xl border p-3.5 transition-colors",
+        "rounded-lg border p-2.5 transition-colors",
         blocked ? "border-border bg-card/40" : "border-border bg-card/30"
       )}
     >
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <div className="flex items-center gap-2 text-sm">
-            {item.url ? (
-              <a
-                href={item.url}
-                target="_blank"
-                rel="noreferrer"
-                className="font-semibold text-foreground underline-offset-2 hover:underline"
-              >
-                {item.key}
-              </a>
-            ) : (
-              <span className="font-semibold text-foreground">{item.key}</span>
-            )}
-            {blocked && (
-              <Badge className="border-red-500/40 bg-red-500/15 text-red-300">Blocked</Badge>
-            )}
-          </div>
-          <p className="mt-1 text-sm text-foreground">{item.summary}</p>
+      <div className="min-w-0">
+        <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+          {item.url ? (
+            <a
+              href={item.url}
+              target="_blank"
+              rel="noreferrer"
+              className="text-sm font-semibold text-foreground underline-offset-2 hover:underline"
+            >
+              {item.key}
+            </a>
+          ) : (
+            <span className="text-sm font-semibold text-foreground">{item.key}</span>
+          )}
         </div>
-        <div className="flex shrink-0 flex-col gap-1.5">
-          <Badge className={cn("border", priorityTone(item.priority))}>
-            {item.priority || "None"}
-          </Badge>
-          <Badge className={cn("border", statusTone(item.status, blocked))}>
-            {item.status || "Unknown"}
-          </Badge>
-        </div>
+        <p className="mt-1 line-clamp-2 text-sm leading-snug text-foreground">{item.summary}</p>
       </div>
-      <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-        <span className="rounded-md bg-muted/40 px-2 py-1">Owner: {item.assignee || "Unassigned"}</span>
+      <div className="mt-2 flex flex-wrap gap-1">
+        {showBlockedChip && (
+          <Badge className="border-red-500/40 bg-red-500/15 text-[10px] text-red-300">Blocked</Badge>
+        )}
+        <Badge className={cn("border text-[10px]", priorityTone(item.priority))}>
+          {item.priority || "None"}
+        </Badge>
+        <Badge className={cn("border text-[10px]", statusTone(item.status, blocked))}>
+          {statusText}
+        </Badge>
+      </div>
+      <div className="mt-2 flex flex-wrap gap-1 text-[10px] text-muted-foreground">
+        <span className="rounded bg-muted/40 px-1.5 py-0.5">Owner: {item.assignee || "Unassigned"}</span>
         {!!item.labels?.length && (
-          <span className="rounded-md bg-muted/40 px-2 py-1">
-            Labels: {item.labels.join(", ")}
-          </span>
+          <span className="rounded bg-muted/40 px-1.5 py-0.5">Labels: {item.labels.join(", ")}</span>
         )}
       </div>
-      <p className="mt-2 text-xs text-muted-foreground">Why selected: {item.reason}</p>
+      <p className="mt-1.5 line-clamp-2 text-[10px] leading-relaxed text-muted-foreground">
+        <span className="text-muted-foreground/70">Why:</span> {item.reason}
+      </p>
     </div>
   );
 }
@@ -405,7 +405,7 @@ export default function DashboardOpsPage() {
     [teamMembers]
   );
 
-  const unifiedActivity = useMemo(() => (unifiedOps?.items || []).slice(0, 15), [unifiedOps]);
+  const unifiedActivity = useMemo(() => (unifiedOps?.items || []).slice(0, 8), [unifiedOps]);
   const unifiedSummary = unifiedOps?.summary;
   const topRiskItems = useMemo(
     () =>
@@ -555,13 +555,13 @@ export default function DashboardOpsPage() {
   }, [opsBrief?.text]);
 
   return (
-    <section className="relative min-h-screen overflow-hidden pb-12">
+    <section className="relative min-h-screen overflow-hidden pb-8">
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_90%_60%_at_50%_-15%,rgba(99,102,241,0.14),transparent_55%),radial-gradient(ellipse_60%_40%_at_100%_0%,rgba(56,189,248,0.08),transparent)]"
       />
-      <div className="relative mx-auto max-w-7xl space-y-8 px-4 sm:px-6">
-        <div className="rounded-2xl border border-border/70 bg-card/50 p-5 shadow-xl shadow-black/25 ring-1 ring-white/5 backdrop-blur-sm sm:p-6">
+      <div className="relative mx-auto max-w-7xl space-y-5 px-4 sm:px-6">
+        <div className="rounded-2xl border border-border/70 bg-card/50 p-4 shadow-xl shadow-black/25 ring-1 ring-white/5 backdrop-blur-sm sm:p-5">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-muted-foreground/80">
@@ -640,7 +640,7 @@ export default function DashboardOpsPage() {
 
         {!loading && (
           <>
-            <div className="overflow-hidden rounded-2xl border border-indigo-500/20 bg-gradient-to-br from-indigo-500/10 via-card/60 to-card/30 p-5 shadow-lg ring-1 ring-indigo-500/10 sm:p-6">
+            <div className="overflow-hidden rounded-2xl border border-indigo-500/20 bg-gradient-to-br from-indigo-500/10 via-card/60 to-card/30 p-4 shadow-lg ring-1 ring-indigo-500/10 sm:p-5">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div className="flex items-center gap-2">
                   <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-500/20 text-indigo-200">
@@ -661,7 +661,7 @@ export default function DashboardOpsPage() {
                   {briefRefreshing ? "Refreshing…" : "Refresh"}
                 </Button>
               </div>
-              <ul className="mt-4 space-y-2.5 border-t border-border/50 pt-4 text-sm leading-relaxed text-foreground/90">
+              <ul className="mt-3 space-y-1.5 border-t border-border/50 pt-3 text-sm leading-relaxed text-foreground/90">
                 {briefDisplayLines.map((line, i) => (
                   <li key={i} className="flex gap-2">
                     <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-indigo-400/80" aria-hidden />
@@ -675,54 +675,54 @@ export default function DashboardOpsPage() {
               </p>
             </div>
 
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-              <div className="rounded-xl border border-red-500/25 bg-red-500/5 p-4 ring-1 ring-inset ring-red-500/10">
-                <p className="text-xs font-medium text-muted-foreground">Critical attention</p>
-                <p className="mt-1 text-2xl font-bold tabular-nums text-red-300">{unifiedSummary?.kpis.critical ?? 0}</p>
+            <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+              <div className="rounded-lg border border-red-500/25 bg-red-500/5 p-3 ring-1 ring-inset ring-red-500/10">
+                <p className="text-[11px] font-medium text-muted-foreground">Critical attention</p>
+                <p className="mt-0.5 text-xl font-bold tabular-nums text-red-300">{unifiedSummary?.kpis.critical ?? 0}</p>
               </div>
-              <div className="rounded-xl border border-amber-500/25 bg-amber-500/5 p-4 ring-1 ring-inset ring-amber-500/10">
-                <p className="text-xs font-medium text-muted-foreground">Needs owner</p>
-                <p className="mt-1 text-2xl font-bold tabular-nums text-amber-300">{unifiedSummary?.kpis.needs_owner ?? 0}</p>
+              <div className="rounded-lg border border-amber-500/25 bg-amber-500/5 p-3 ring-1 ring-inset ring-amber-500/10">
+                <p className="text-[11px] font-medium text-muted-foreground">Needs owner</p>
+                <p className="mt-0.5 text-xl font-bold tabular-nums text-amber-300">{unifiedSummary?.kpis.needs_owner ?? 0}</p>
               </div>
-              <div className="rounded-xl border border-orange-500/25 bg-orange-500/5 p-4 ring-1 ring-inset ring-orange-500/10">
-                <p className="text-xs font-medium text-muted-foreground">Stale</p>
-                <p className="mt-1 text-2xl font-bold tabular-nums text-orange-300">{unifiedSummary?.kpis.stale ?? 0}</p>
+              <div className="rounded-lg border border-orange-500/25 bg-orange-500/5 p-3 ring-1 ring-inset ring-orange-500/10">
+                <p className="text-[11px] font-medium text-muted-foreground">Stale</p>
+                <p className="mt-0.5 text-xl font-bold tabular-nums text-orange-300">{unifiedSummary?.kpis.stale ?? 0}</p>
               </div>
-              <div className="rounded-xl border border-sky-500/25 bg-sky-500/5 p-4 ring-1 ring-inset ring-sky-500/10">
-                <p className="text-xs font-medium text-muted-foreground">High priority</p>
-                <p className="mt-1 text-2xl font-bold tabular-nums text-sky-300">{unifiedSummary?.kpis.high_priority ?? 0}</p>
+              <div className="rounded-lg border border-sky-500/25 bg-sky-500/5 p-3 ring-1 ring-inset ring-sky-500/10">
+                <p className="text-[11px] font-medium text-muted-foreground">High priority</p>
+                <p className="mt-0.5 text-xl font-bold tabular-nums text-sky-300">{unifiedSummary?.kpis.high_priority ?? 0}</p>
               </div>
             </div>
 
-            <div className="rounded-xl border border-border/80 bg-muted/20 px-4 py-3 text-sm text-muted-foreground">
+            <div className="rounded-lg border border-border/80 bg-muted/20 px-3 py-2 text-sm text-muted-foreground">
               {unifiedSummary?.insight || "Unified command-center insight will appear here once data is available."}
             </div>
           </>
         )}
 
         {!loading && (
-          <div className={cn("grid gap-6 lg:gap-8", sidebarVisible ? "lg:grid-cols-12" : "lg:grid-cols-1")}>
-            <div className={cn("space-y-6", sidebarVisible ? "lg:col-span-8" : "lg:col-span-12")}>
+          <div className={cn("grid gap-4 lg:gap-6", sidebarVisible ? "lg:grid-cols-12" : "lg:grid-cols-1")}>
+            <div className={cn("space-y-4", sidebarVisible ? "lg:col-span-8" : "lg:col-span-12")}>
               {topRiskItems.length > 0 && (
-                <div className="rounded-2xl border border-amber-500/20 bg-gradient-to-br from-amber-500/5 to-card/40 p-5 shadow-lg ring-1 ring-amber-500/10">
-                  <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+                <div className="rounded-2xl border border-amber-500/20 bg-gradient-to-br from-amber-500/5 to-card/40 p-4 shadow-lg ring-1 ring-amber-500/10">
+                  <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
                     <div>
                       <h2 className="font-serif text-lg font-semibold text-foreground">Top risks</h2>
                       <p className="text-xs text-muted-foreground">Highest-impact items for the current filter</p>
                     </div>
                     <Badge className="border-amber-500/30 bg-amber-500/10 text-amber-100">{topRiskItems.length} prioritized</Badge>
                   </div>
-                  <div className="space-y-3">
-                    {topRiskItems.map((item) => {
+                  <div className="space-y-2">
+                    {topRiskItems.slice(0, 5).map((item) => {
                       const raw = (item.raw || {}) as Record<string, unknown>;
                       const isJira = item.source === "jira";
                       const isGithub = item.source === "github";
                       return (
-                        <div key={`risk-${item.id}`} className="rounded-xl border border-border/80 bg-card/50 p-4 shadow-sm">
-                          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                        <div key={`risk-${item.id}`} className="rounded-xl border border-border/80 bg-card/50 p-3 shadow-sm">
+                          <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                             <div className="min-w-0 flex-1">
                               <UnifiedRowHeading item={item} linkUrl={item.url} />
-                              <div className="mt-3 border-t border-border/40 pt-2">
+                              <div className="mt-2 border-t border-border/40 pt-2">
                                 <MetaChips subtitle={item.subtitle} />
                               </div>
                             </div>
@@ -815,8 +815,8 @@ export default function DashboardOpsPage() {
                 </div>
               )}
 
-              <div className="rounded-2xl border border-cyan-500/15 bg-card/40 p-5 shadow-xl shadow-black/10 ring-1 ring-cyan-500/10">
-                <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+              <div className="rounded-2xl border border-cyan-500/15 bg-card/40 p-4 shadow-xl shadow-black/10 ring-1 ring-cyan-500/10">
+                <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
                   <div>
                     <h2 className="font-serif text-lg font-semibold">Unified activity</h2>
                     <p className="text-xs text-muted-foreground">Ranked events across Jira and GitHub</p>
@@ -828,11 +828,11 @@ export default function DashboardOpsPage() {
                 {unifiedActivity.length === 0 ? (
                   <p className="text-sm text-muted-foreground">No events for current filter.</p>
                 ) : (
-                  <div className="space-y-3">
+                  <div className="space-y-2">
                     {unifiedActivity.map((item) => (
-                      <div key={`unified-${item.id}`} className="rounded-xl border border-border/80 bg-card/50 p-4">
+                      <div key={`unified-${item.id}`} className="rounded-xl border border-border/80 bg-card/50 p-3">
                         <UnifiedRowHeading item={item} linkUrl={item.url} />
-                        <div className="mt-3 border-t border-border/40 pt-2">
+                        <div className="mt-2 border-t border-border/40 pt-2">
                           <MetaChips subtitle={`Source: ${item.source} | ${item.subtitle}`} />
                         </div>
                       </div>
