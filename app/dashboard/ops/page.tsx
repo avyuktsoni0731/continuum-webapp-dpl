@@ -977,7 +977,7 @@ export default function DashboardOpsPage() {
 
             {sidebarVisible && (
               <aside className="space-y-6 lg:col-span-4 lg:sticky lg:top-24 lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto lg:self-start lg:pr-1">
-                {health && integrationFilter !== "github" && (
+                {health && (
                   <div className="rounded-2xl border border-border/80 bg-card/40 p-5 shadow-sm">
                     <div className="mb-4 flex items-center justify-between gap-2">
                       <h2 className="font-serif text-lg font-semibold">Issue health</h2>
@@ -1039,7 +1039,7 @@ export default function DashboardOpsPage() {
                   </div>
                 )}
 
-                {opsFeed && integrationFilter !== "github" && (
+                {opsFeed && (
                   <div className="rounded-2xl border border-border/80 bg-card/40 p-5 shadow-sm">
                     <div className="mb-4 flex items-center justify-between">
                       <h2 className="font-serif text-lg font-semibold">Ops feed</h2>
@@ -1104,7 +1104,7 @@ export default function DashboardOpsPage() {
                   </div>
                 )}
 
-                {ledger && integrationFilter !== "github" && (
+                {ledger && (
                   <div className="rounded-2xl border border-red-500/15 bg-card/40 p-5 shadow-sm ring-1 ring-red-500/10">
                     <div className="mb-4 flex items-center justify-between">
                       <h2 className="font-serif text-lg font-semibold">Blocker ledger</h2>
