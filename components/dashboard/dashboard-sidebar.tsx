@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
   BarChart3,
-  ClipboardList,
+  Workflow,
   Plug,
   CreditCard,
   FileText,
@@ -20,7 +20,7 @@ import { Button } from "@/components/ui/button";
 
 const navItems = [
   { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
-  { href: "/dashboard/ops", label: "Issue Ops", icon: ClipboardList },
+  { href: "/ops", label: "Continuum Ops", icon: Workflow },
   { href: "/dashboard/usage", label: "Usage", icon: BarChart3 },
   { href: "/dashboard/integrations", label: "Integrations", icon: Plug },
   { href: "/dashboard/billing", label: "Billing & Invoices", icon: CreditCard },
@@ -45,6 +45,7 @@ export function DashboardSidebar({
   const pathname = usePathname();
   const isActive = (href: string) => {
     if (href === "/dashboard") return pathname === "/dashboard";
+    if (href === "/ops") return pathname === "/ops" || pathname.startsWith("/ops/");
     return pathname.startsWith(href);
   };
 

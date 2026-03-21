@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Workflow } from "lucide-react";
 
 export function Hero() {
   return (
@@ -29,6 +29,22 @@ export function Hero() {
             Now in Private Beta
           </Badge>
         </motion.div>
+
+        {/* <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.25 }}
+          className="flex flex-wrap items-center justify-center gap-2"
+        >
+          <Link
+            href="/ops"
+            className="group inline-flex items-center gap-2 rounded-full border border-cyan-500/40 bg-cyan-500/10 px-4 py-2 text-sm font-medium text-cyan-100 shadow-sm shadow-cyan-500/10 transition-colors hover:bg-cyan-500/20"
+          >
+            <Workflow className="h-4 w-4 text-cyan-300" />
+            Continuum Ops — Jira &amp; GitHub command center
+            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+          </Link>
+        </motion.div> */}
 
         <motion.h1
           initial={{ opacity: 0, y: 30 }}

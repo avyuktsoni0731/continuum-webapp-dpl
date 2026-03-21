@@ -37,7 +37,7 @@ export function Navbar() {
         <div className="flex items-center gap-16">
           <Link
             href="/"
-            className="flex items-center hover:opacity-80 transition-opacity"
+            className="flex items-center hover:opacity-80 transition-opacity gap-2"
           >
             <Image src="/Continuum_Logo.png" alt="Continuum" width={40} height={40} />
             <span className="font-serif text-lg font-bold tracking-tight">
@@ -105,62 +105,93 @@ export function Navbar() {
           </div>
         </div>
         {isLoggedIn ? (
-          <DropdownMenu.Root>
-            <DropdownMenu.Trigger asChild>
-              <button
-                className="rounded-full focus:outline-none focus:ring-2 focus:ring-accent/50 focus:ring-offset-2 focus:ring-offset-background"
-                aria-label="Account menu"
-              >
-                <Avatar.Root className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full border border-border bg-accent/20 ring-offset-background">
-                  <Avatar.Image
-                    src={session?.user?.image ?? undefined}
-                    alt={session?.user?.name ?? "User"}
-                    className="h-full w-full object-cover"
-                  />
-                  <Avatar.Fallback
-                    className="flex h-full w-full items-center justify-center bg-accent/30 text-sm font-medium text-foreground"
-                    delayMs={0}
-                  >
-                    {session?.user?.name
-                      ? session.user.name
-                        .split(" ")
-                        .map((n) => n[0])
-                        .join("")
-                        .toUpperCase()
-                        .slice(0, 2)
-                      : session?.user?.email?.[0]?.toUpperCase() ?? "?"}
-                  </Avatar.Fallback>
-                </Avatar.Root>
-              </button>
-            </DropdownMenu.Trigger>
-            <DropdownMenu.Portal>
-              <DropdownMenu.Content
-                className="min-w-[180px] rounded-xl border border-border bg-card p-1 shadow-xl"
-                sideOffset={8}
-                align="end"
-              >
-                <DropdownMenu.Item asChild>
-                  <Link
-                    href="/dashboard"
-                    className="flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm outline-none hover:bg-accent/10 focus:bg-accent/10"
-                  >
-                    <LayoutDashboard className="h-4 w-4" />
-                    Dashboard
-                  </Link>
-                </DropdownMenu.Item>
-                <DropdownMenu.Separator className="my-1 h-px bg-border" />
-                <DropdownMenu.Item asChild>
-                  <button
-                    onClick={() => signOut({ callbackUrl: "/" })}
-                    className="flex w-full cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm text-destructive outline-none hover:bg-destructive/10 focus:bg-destructive/10"
-                  >
-                    <LogOut className="h-4 w-4" />
-                    Sign out
-                  </button>
-                </DropdownMenu.Item>
-              </DropdownMenu.Content>
-            </DropdownMenu.Portal>
-          </DropdownMenu.Root>
+          <div className="flex items-center gap-2">
+            {/* <Link
+              href="/ops"
+              className="hidden sm:inline-flex items-center hover:opacity-80 transition-opacity"
+              aria-label="Continuum Ops"
+            >
+              <Image
+                src="/Continuum_Ops_Logo.png"
+                alt=""
+                width={72}
+                height={28}
+                className="h-7 w-auto object-contain"
+              />
+            </Link> */}
+            <DropdownMenu.Root>
+              <DropdownMenu.Trigger asChild>
+                <button
+                  className="rounded-full focus:outline-none focus:ring-2 focus:ring-accent/50 focus:ring-offset-2 focus:ring-offset-background"
+                  aria-label="Account menu"
+                >
+                  <Avatar.Root className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full border border-border bg-accent/20 ring-offset-background">
+                    <Avatar.Image
+                      src={session?.user?.image ?? undefined}
+                      alt={session?.user?.name ?? "User"}
+                      className="h-full w-full object-cover"
+                    />
+                    <Avatar.Fallback
+                      className="flex h-full w-full items-center justify-center bg-accent/30 text-sm font-medium text-foreground"
+                      delayMs={0}
+                    >
+                      {session?.user?.name
+                        ? session.user.name
+                          .split(" ")
+                          .map((n) => n[0])
+                          .join("")
+                          .toUpperCase()
+                          .slice(0, 2)
+                        : session?.user?.email?.[0]?.toUpperCase() ?? "?"}
+                    </Avatar.Fallback>
+                  </Avatar.Root>
+                </button>
+              </DropdownMenu.Trigger>
+              <DropdownMenu.Portal>
+                <DropdownMenu.Content
+                  className="min-w-[180px] rounded-xl border border-border bg-card p-1 shadow-xl"
+                  sideOffset={8}
+                  align="end"
+                >
+                  <DropdownMenu.Item asChild>
+                    <Link
+                      href="/dashboard"
+                      className="flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm outline-none hover:bg-accent/10 focus:bg-accent/10"
+                    >
+                      <LayoutDashboard className="h-4 w-4" />
+                      Dashboard
+                    </Link>
+                  </DropdownMenu.Item>
+                  <DropdownMenu.Item asChild>
+                    <Link
+                      href="/ops"
+                      className="flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm outline-none hover:bg-cyan-500/15 focus:bg-cyan-500/15"
+                    >
+                      <Image
+                        src="/Continuum_Ops_Logo.png"
+                        alt=""
+                        width={72}
+                        height={24}
+                        className="h-5 w-auto object-contain"
+                        aria-hidden
+                      />
+                      <span>Continuum Ops</span>
+                    </Link>
+                  </DropdownMenu.Item>
+                  <DropdownMenu.Separator className="my-1 h-px bg-border" />
+                  <DropdownMenu.Item asChild>
+                    <button
+                      onClick={() => signOut({ callbackUrl: "/" })}
+                      className="flex w-full cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm text-destructive outline-none hover:bg-destructive/10 focus:bg-destructive/10"
+                    >
+                      <LogOut className="h-4 w-4" />
+                      Sign out
+                    </button>
+                  </DropdownMenu.Item>
+                </DropdownMenu.Content>
+              </DropdownMenu.Portal>
+            </DropdownMenu.Root>
+          </div>
         ) : (
           <div className="flex items-center gap-2">
             <Link href="/login">

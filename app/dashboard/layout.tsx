@@ -45,7 +45,7 @@ function DashboardLayoutContent({
         onMobileClose={() => setMobileSidebarOpen(false)}
       />
       {/* Main: offset by sidebar width on desktop so content is beside fixed sidebar */}
-      <main className="min-h-screen overflow-auto p-4 md:ml-[280px] md:p-6">
+      <main className="min-h-screen min-w-0 max-w-full overflow-x-hidden overflow-y-auto p-4 md:ml-[280px] md:p-6">
         {/* Mobile: menu button bar */}
         <div className="sticky top-0 z-20 -mx-4 -mt-4 flex items-center gap-2 border-b border-border bg-background px-4 py-3 md:hidden md:mx-0 md:mt-0">
           <Button

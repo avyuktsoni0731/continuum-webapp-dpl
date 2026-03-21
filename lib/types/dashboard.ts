@@ -145,4 +145,67 @@ export interface UnifiedOpsResponse {
   integration: "all" | "jira" | "github";
   total: number;
   items: UnifiedOpsItem[];
+  summary?: {
+    kpis: {
+      critical: number;
+      needs_owner: number;
+      stale: number;
+      high_priority: number;
+    };
+    by_source: {
+      jira: number;
+      github: number;
+    };
+    by_event: Record<string, number>;
+    top_risks: Array<{
+      id: string;
+      title: string;
+      source: "jira" | "github" | string;
+      rank: number;
+    }>;
+    insight: string;
+  };
+}
+
+export interface UnifiedOpsBriefResponse {
+  name: string;
+  workspace_id: string;
+  integration: "all" | "jira" | "github" | string;
+  repo?: string | null;
+  generated_at: string;
+  text: string;
+  refresh_remaining: number;
+}
+
+export interface GithubOrg {
+  login: string;
+  name: string;
+}
+
+export interface GithubRepo {
+  full_name: string;
+  name: string;
+  private: boolean;
+}
+
+export interface GithubOpsConfigResponse {
+  workspace_id: string;
+  github_connected: boolean;
+  default_repo: string | null;
+}
+
+export interface GithubOrgsResponse {
+  workspace_id: string;
+  github_connected: boolean;
+  orgs: GithubOrg[];
+  error?: string | null;
+}
+
+export interface GithubReposResponse {
+  workspace_id: string;
+  github_connected: boolean;
+  org?: string | null;
+  source?: "org" | "user" | "none";
+  repos: GithubRepo[];
+  error?: string | null;
 }
