@@ -293,6 +293,14 @@ export default function DashboardOpsPage() {
   );
 
   const unifiedActivity = useMemo(() => (unifiedOps?.items || []).slice(0, 15), [unifiedOps]);
+  const unifiedSummary = unifiedOps?.summary;
+  const topRiskItems = useMemo(
+    () =>
+      (unifiedSummary?.top_risks || [])
+        .map((risk) => (unifiedOps?.items || []).find((item) => item.id === risk.id))
+        .filter((item): item is NonNullable<typeof item> => !!item),
+    [unifiedOps?.items, unifiedSummary?.top_risks]
+  );
 
   const openGithubModal = (item: GithubPrOpsResponse["items"][number], type: "assign" | "review") => {
     setGithubActionItem(item);
@@ -471,6 +479,152 @@ export default function DashboardOpsPage() {
         {error && (
           <div className="rounded-xl border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">
             {error}
+          </div>
+        )}
+
+        {!loading && (
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="rounded-xl border border-border bg-card/30 p-4">
+              <p className="text-xs text-muted-foreground">Critical Attention</p>
+              <p className="mt-1 text-xl font-semibold text-red-300">{unifiedSummary?.kpis.critical ?? 0}</p>
+            </div>
+            <div className="rounded-xl border border-border bg-card/30 p-4">
+              <p className="text-xs text-muted-foreground">Needs Owner</p>
+              <p className="mt-1 text-xl font-semibold text-amber-300">{unifiedSummary?.kpis.needs_owner ?? 0}</p>
+            </div>
+            <div className="rounded-xl border border-border bg-card/30 p-4">
+              <p className="text-xs text-muted-foreground">Stale Items</p>
+              <p className="mt-1 text-xl font-semibold text-orange-300">{unifiedSummary?.kpis.stale ?? 0}</p>
+            </div>
+            <div className="rounded-xl border border-border bg-card/30 p-4">
+              <p className="text-xs text-muted-foreground">High Priority</p>
+              <p className="mt-1 text-xl font-semibold text-sky-300">{unifiedSummary?.kpis.high_priority ?? 0}</p>
+            </div>
+          </div>
+        )}
+
+        {!loading && (
+          <div className="rounded-xl border border-border bg-card/30 p-4 text-sm text-muted-foreground">
+            <p>
+              {unifiedSummary?.insight || "Unified command-center insight will appear here once data is available."}
+            </p>
+          </div>
+        )}
+
+        {!loading && topRiskItems.length > 0 && (
+          <div className="rounded-2xl border border-border bg-card/30 p-5 shadow-sm">
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="font-medium">Top Risks</h2>
+              <Badge className="border-border bg-card/40 text-muted-foreground">{topRiskItems.length} prioritized</Badge>
+            </div>
+            <div className="space-y-2">
+              {topRiskItems.map((item) => {
+                const raw = (item.raw || {}) as Record<string, unknown>;
+                const isJira = item.source === "jira";
+                const isGithub = item.source === "github";
+                return (
+                  <div key={`risk-${item.id}`} className="rounded-xl border border-border bg-card/40 p-3">
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium text-foreground">
+                          {item.url ? (
+                            <a href={item.url} target="_blank" rel="noreferrer" className="underline-offset-2 hover:underline">
+                              {item.id}
+                            </a>
+                          ) : (
+                            item.id
+                          )}{" "}
+                          - {item.title}
+                        </p>
+                        <p className="mt-1 text-xs text-muted-foreground">{item.subtitle}</p>
+                      </div>
+                      <div className="flex shrink-0 items-center gap-2">
+                        <Badge className="border-border bg-card/40 text-muted-foreground">{item.source}</Badge>
+                        {isJira && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="rounded-full"
+                            onClick={() =>
+                              openAssignModal({
+                                key: String(raw.key || item.id.replace(/^jira:/, "")),
+                                summary: String(raw.summary || item.title),
+                                status: String(raw.status || ""),
+                                priority: String(raw.priority || ""),
+                                assignee: String(raw.assignee || ""),
+                                labels: Array.isArray(raw.labels) ? (raw.labels as string[]) : [],
+                                url: typeof raw.url === "string" ? raw.url : item.url,
+                                reason: String(raw.reason || item.subtitle),
+                              })
+                            }
+                          >
+                            Assign
+                          </Button>
+                        )}
+                        {isGithub && (
+                          <>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="rounded-full"
+                              onClick={() =>
+                                openGithubModal(
+                                  {
+                                    repo: String(raw.repo || ""),
+                                    number: Number(raw.number || 0),
+                                    title: String(raw.title || item.title),
+                                    author: String(raw.author || "Unknown"),
+                                    url: typeof raw.url === "string" ? raw.url : item.url,
+                                    updated_at: typeof raw.updated_at === "string" ? raw.updated_at : null,
+                                    stale_days: Number(raw.stale_days || item.stale_days || 0),
+                                    assignees: Array.isArray(raw.assignees) ? (raw.assignees as string[]) : [],
+                                    requested_reviewers: Array.isArray(raw.requested_reviewers)
+                                      ? (raw.requested_reviewers as string[])
+                                      : [],
+                                    event_type:
+                                      (String(raw.event_type || "review_needed") as GithubPrOpsResponse["items"][number]["event_type"]),
+                                  },
+                                  "review"
+                                )
+                              }
+                            >
+                              Request review
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="rounded-full"
+                              onClick={() =>
+                                openGithubModal(
+                                  {
+                                    repo: String(raw.repo || ""),
+                                    number: Number(raw.number || 0),
+                                    title: String(raw.title || item.title),
+                                    author: String(raw.author || "Unknown"),
+                                    url: typeof raw.url === "string" ? raw.url : item.url,
+                                    updated_at: typeof raw.updated_at === "string" ? raw.updated_at : null,
+                                    stale_days: Number(raw.stale_days || item.stale_days || 0),
+                                    assignees: Array.isArray(raw.assignees) ? (raw.assignees as string[]) : [],
+                                    requested_reviewers: Array.isArray(raw.requested_reviewers)
+                                      ? (raw.requested_reviewers as string[])
+                                      : [],
+                                    event_type:
+                                      (String(raw.event_type || "unassigned") as GithubPrOpsResponse["items"][number]["event_type"]),
+                                  },
+                                  "assign"
+                                )
+                              }
+                            >
+                              Assign PR
+                            </Button>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         )}
 

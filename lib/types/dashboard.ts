@@ -145,6 +145,26 @@ export interface UnifiedOpsResponse {
   integration: "all" | "jira" | "github";
   total: number;
   items: UnifiedOpsItem[];
+  summary?: {
+    kpis: {
+      critical: number;
+      needs_owner: number;
+      stale: number;
+      high_priority: number;
+    };
+    by_source: {
+      jira: number;
+      github: number;
+    };
+    by_event: Record<string, number>;
+    top_risks: Array<{
+      id: string;
+      title: string;
+      source: "jira" | "github" | string;
+      rank: number;
+    }>;
+    insight: string;
+  };
 }
 
 export interface GithubOrg {
