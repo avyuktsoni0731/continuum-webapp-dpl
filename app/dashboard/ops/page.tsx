@@ -2,7 +2,17 @@
 
 import { useMemo, useState } from "react";
 import { useSession } from "next-auth/react";
-import { AlertTriangle, Loader2, ShieldAlert, CheckCircle2 } from "lucide-react";
+import {
+  AlertTriangle,
+  CheckCircle2,
+  ExternalLink,
+  GitBranch,
+  LayoutGrid,
+  Loader2,
+  ShieldAlert,
+  Sparkles,
+  Ticket,
+} from "lucide-react";
 import { useDashboard } from "@/components/dashboard/dashboard-provider";
 import { apiFetch } from "@/lib/api";
 import { Badge } from "@/components/ui/badge";
@@ -21,6 +31,13 @@ import type {
   UnifiedOpsResponse,
 } from "@/lib/types/dashboard";
 import { useEffect } from "react";
+import {
+  eventLabel,
+  parseSubtitleChips,
+  parseUnifiedId,
+  shortRepoLabel,
+  splitBriefLines,
+} from "@/lib/ops-format";
 
 function isBlocked(item: DashboardIssueItem) {
   const labels = item.labels || [];
@@ -94,6 +111,45 @@ function IssueRow({ item }: { item: DashboardIssueItem }) {
       </div>
       <p className="mt-2 text-xs text-muted-foreground">Why selected: {item.reason}</p>
     </div>
+  );
+}
+
+function MetaChips({ subtitle }: { subtitle: string }) {
+  const chips = parseSubtitleChips(subtitle);
+  if (chips.length === 0) {
+    return <p className="text-xs leading-relaxed text-muted-foreground">{subtitle}</p>;
+  }
+  return (
+    <div className="flex flex-wrap gap-1.5">
+      {chips.map((c) => (
+        <span
+          key={`${c.label}-${c.value}`}
+          className="inline-flex max-w-full items-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-2 py-1 text-[11px] shadow-sm"
+        >
+          <span className="shrink-0 text-[10px] font-medium uppercase tracking-wide text-violet-300/90">
+            {c.label}
+          </span>
+          <span className="min-w-0 truncate text-foreground/90">{c.value}</span>
+        </span>
+      ))}
+    </div>
+  );
+}
+
+function SourceBadge({ source }: { source: "jira" | "github" }) {
+  if (source === "jira") {
+    return (
+      <span className="inline-flex items-center gap-1 rounded-full border border-sky-500/35 bg-sky-500/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-sky-200">
+        <Ticket className="h-3 w-3" />
+        Jira
+      </span>
+    );
+  }
+  return (
+    <span className="inline-flex items-center gap-1 rounded-full border border-violet-500/35 bg-violet-500/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-violet-200">
+      <GitBranch className="h-3 w-3" />
+      GitHub
+    </span>
   );
 }
 
