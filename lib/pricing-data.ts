@@ -175,6 +175,8 @@ export interface FeatureItem {
 export interface FeatureCategory {
   category: string;
   items: FeatureItem[];
+  /** Shared row styling for Continuum Ops (teal accent) */
+  variant?: "ops-highlight";
 }
 
 export const FEATURE_MATRIX: FeatureCategory[] = [
@@ -223,13 +225,33 @@ export const FEATURE_MATRIX: FeatureCategory[] = [
         pro: true,
         enterprise: true,
       },
+    ],
+  },
+  {
+    category: "Continuum Ops",
+    variant: "ops-highlight",
+    items: [
       {
-        name: "UNIFIED COMMAND CENTER",
+        name: "Continuum Ops — Unified command center",
         nameVariant: "ops-logo",
         free: false,
         starter: true,
         pro: true,
         enterprise: true,
+      },
+      {
+        name: "AI-generated Ops briefs (per user / day)",
+        free: "0",
+        starter: "2",
+        pro: "8",
+        enterprise: "Unlimited",
+      },
+      {
+        name: "Manual Ops brief refreshes (per user / day)",
+        free: "0",
+        starter: "2",
+        pro: "5",
+        enterprise: "Unlimited",
       },
     ],
   },
@@ -284,22 +306,6 @@ export const FEATURE_MATRIX: FeatureCategory[] = [
         starter: "1",
         pro: "1",
         enterprise: "Unlimited",
-      },
-      {
-        name: "AI-generated Ops briefs (per user / day)",
-        free: "0",
-        starter: "2",
-        pro: "8",
-        enterprise: "Unlimited",
-        rowAccent: "ops",
-      },
-      {
-        name: "Manual Ops brief refreshes (per user / day)",
-        free: "0",
-        starter: "2",
-        pro: "5",
-        enterprise: "Unlimited",
-        rowAccent: "ops",
       },
     ],
   },
