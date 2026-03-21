@@ -194,7 +194,7 @@ function UnifiedRowHeading({
             inner
           )}
         </div>
-        <p className="mt-1.5 text-sm font-medium leading-snug text-foreground line-clamp-2">{item.title}</p>
+        <p className="mt-1 text-sm font-medium leading-snug text-foreground line-clamp-1">{item.title}</p>
       </div>
     </div>
   );
@@ -640,7 +640,7 @@ export default function DashboardOpsPage() {
 
         {!loading && (
           <>
-            <div className="overflow-hidden rounded-2xl border border-indigo-500/20 bg-gradient-to-br from-indigo-500/10 via-card/60 to-card/30 p-4 shadow-lg ring-1 ring-indigo-500/10 sm:p-5">
+            <div className="overflow-hidden rounded-2xl border border-indigo-500/20 bg-linear-to-br from-indigo-500/10 via-card/60 to-card/30 p-4 shadow-lg ring-1 ring-indigo-500/10 sm:p-5">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div className="flex items-center gap-2">
                   <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-500/20 text-indigo-200">
@@ -704,7 +704,7 @@ export default function DashboardOpsPage() {
           <div className={cn("grid gap-4 lg:gap-6", sidebarVisible ? "lg:grid-cols-12" : "lg:grid-cols-1")}>
             <div className={cn("space-y-4", sidebarVisible ? "lg:col-span-8" : "lg:col-span-12")}>
               {topRiskItems.length > 0 && (
-                <div className="rounded-2xl border border-amber-500/20 bg-gradient-to-br from-amber-500/5 to-card/40 p-4 shadow-lg ring-1 ring-amber-500/10">
+                <div className="rounded-2xl border border-amber-500/20 bg-linear-to-br from-amber-500/5 to-card/40 p-4 shadow-lg ring-1 ring-amber-500/10">
                   <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
                     <div>
                       <h2 className="font-serif text-lg font-semibold text-foreground">Top risks</h2>
@@ -842,8 +842,8 @@ export default function DashboardOpsPage() {
               </div>
 
               {githubOps && integrationFilter !== "jira" && (
-                <div className="rounded-2xl border border-violet-500/20 bg-gradient-to-br from-violet-500/5 to-card/40 p-5 shadow-lg ring-1 ring-violet-500/10">
-                  <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+                <div className="rounded-2xl border border-violet-500/20 bg-linear-to-br from-violet-500/5 to-card/40 p-4 shadow-lg ring-1 ring-violet-500/10">
+                  <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
                     <div>
                       <h2 className="font-serif text-lg font-semibold">GitHub PR ops</h2>
                       <p className="text-xs text-muted-foreground">Pull requests needing attention</p>
@@ -926,9 +926,9 @@ export default function DashboardOpsPage() {
                   ) : githubOps.items.length === 0 ? (
                     <p className="text-sm text-muted-foreground">No PR attention events right now.</p>
                   ) : (
-                    <div className="space-y-3">
-                      {githubOps.items.slice(0, 10).map((item) => (
-                        <div key={`gh-${item.repo}-${item.number}`} className="rounded-xl border border-border/80 bg-card/50 p-4">
+                    <div className="space-y-2">
+                      {githubOps.items.slice(0, 6).map((item) => (
+                        <div key={`gh-${item.repo}-${item.number}`} className="rounded-xl border border-border/80 bg-card/50 p-3">
                           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                             <div className="min-w-0 flex-1">
                               <div className="flex flex-wrap items-center gap-2">
@@ -976,10 +976,10 @@ export default function DashboardOpsPage() {
             </div>
 
             {sidebarVisible && (
-              <aside className="space-y-6 lg:col-span-4 lg:sticky lg:top-24 lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto lg:self-start lg:pr-1">
+              <aside className="space-y-4 lg:col-span-4 lg:pr-1">
                 {health && (
-                  <div className="rounded-2xl border border-border/80 bg-card/40 p-5 shadow-sm">
-                    <div className="mb-4 flex items-center justify-between gap-2">
+                  <div className="rounded-2xl border border-border/80 bg-card/40 p-4 shadow-sm">
+                    <div className="mb-3 flex items-center justify-between gap-2">
                       <h2 className="font-serif text-lg font-semibold">Issue health</h2>
                       <Badge
                         className={cn(
@@ -997,31 +997,35 @@ export default function DashboardOpsPage() {
                         {health.headline}
                       </Badge>
                     </div>
-                    <div className="grid grid-cols-2 gap-2 text-sm sm:grid-cols-5">
-                      <div className="rounded-lg border border-border bg-card/40 p-2.5">
-                        <p className="text-xs text-muted-foreground">Focus</p>
-                        <p className="mt-0.5 font-semibold text-sky-300">{health.focus_count}</p>
+                    <div className="space-y-1.5 text-sm">
+                      <div className="grid grid-cols-3 gap-1.5">
+                        <div className="rounded-md border border-border bg-card/40 p-2 text-center">
+                          <p className="text-[10px] text-muted-foreground">Focus</p>
+                          <p className="mt-0.5 text-base font-semibold tabular-nums text-sky-300">{health.focus_count}</p>
+                        </div>
+                        <div className="rounded-md border border-border bg-card/40 p-2 text-center">
+                          <p className="text-[10px] text-muted-foreground">Blockers</p>
+                          <p className="mt-0.5 text-base font-semibold tabular-nums text-red-300">{health.blockers_count}</p>
+                        </div>
+                        <div className="rounded-md border border-border bg-card/40 p-2 text-center">
+                          <p className="text-[10px] text-muted-foreground">High</p>
+                          <p className="mt-0.5 text-base font-semibold tabular-nums text-orange-300">{health.high_priority_count}</p>
+                        </div>
                       </div>
-                      <div className="rounded-lg border border-border bg-card/40 p-2.5">
-                        <p className="text-xs text-muted-foreground">Blockers</p>
-                        <p className="mt-0.5 font-semibold text-red-300">{health.blockers_count}</p>
-                      </div>
-                      <div className="rounded-lg border border-border bg-card/40 p-2.5">
-                        <p className="text-xs text-muted-foreground">High Priority</p>
-                        <p className="mt-0.5 font-semibold text-orange-300">{health.high_priority_count}</p>
-                      </div>
-                      <div className="rounded-lg border border-border bg-card/40 p-2.5">
-                        <p className="text-xs text-muted-foreground">Owned</p>
-                        <p className="mt-0.5 font-semibold text-emerald-300">{health.ownership.owned}</p>
-                      </div>
-                      <div className="rounded-lg border border-border bg-card/40 p-2.5">
-                        <p className="text-xs text-muted-foreground">Unowned</p>
-                        <p className="mt-0.5 font-semibold text-amber-300">{health.ownership.unowned}</p>
+                      <div className="grid grid-cols-2 gap-1.5">
+                        <div className="rounded-md border border-border bg-card/40 p-2 text-center">
+                          <p className="text-[10px] text-muted-foreground">Owned</p>
+                          <p className="mt-0.5 text-base font-semibold tabular-nums text-emerald-300">{health.ownership.owned}</p>
+                        </div>
+                        <div className="rounded-md border border-border bg-card/40 p-2 text-center">
+                          <p className="text-[10px] text-muted-foreground">Unowned</p>
+                          <p className="mt-0.5 text-base font-semibold tabular-nums text-amber-300">{health.ownership.unowned}</p>
+                        </div>
                       </div>
                     </div>
-                    <div className="mt-4 space-y-2">
-                      {(health.top_items || []).slice(0, 8).map((item) => (
-                        <div key={item.key} className="space-y-2">
+                    <div className="mt-3 space-y-2">
+                      {(health.top_items || []).slice(0, 5).map((item) => (
+                        <div key={item.key} className="space-y-1.5">
                           <IssueRow item={item} />
                           <div className="flex justify-end">
                             <Button
@@ -1040,8 +1044,8 @@ export default function DashboardOpsPage() {
                 )}
 
                 {opsFeed && (
-                  <div className="rounded-2xl border border-border/80 bg-card/40 p-5 shadow-sm">
-                    <div className="mb-4 flex items-center justify-between">
+                  <div className="rounded-2xl border border-border/80 bg-card/40 p-4 shadow-sm">
+                    <div className="mb-3 flex items-center justify-between">
                       <h2 className="font-serif text-lg font-semibold">Ops feed</h2>
                       <Badge className="border-border bg-card/40 text-muted-foreground">
                         {opsFeed.items.length} attention events
@@ -1052,13 +1056,13 @@ export default function DashboardOpsPage() {
                         No urgent events right now. Your issue stream looks stable.
                       </p>
                     ) : integrationFilter === "all" ? (
-                      <details className="group rounded-xl border border-border/60 bg-card/30">
-                        <summary className="cursor-pointer list-none px-4 py-3 text-sm font-medium text-foreground marker:hidden [&::-webkit-details-marker]:hidden">
-                          Show {opsFeed.items.length} attention events (may overlap with activity above)
+                      <details open className="group rounded-xl border border-border/60 bg-card/30">
+                        <summary className="cursor-pointer list-none px-3 py-2 text-xs font-medium text-foreground marker:hidden [&::-webkit-details-marker]:hidden">
+                          Attention events ({opsFeed.items.length}) — may overlap unified activity
                         </summary>
-                        <div className="space-y-2 border-t border-border/50 p-3 pt-2">
-                          {opsFeed.items.slice(0, 10).map((item) => (
-                            <div key={`feed-${item.key}-${item.event_type}`} className="rounded-lg border border-border/60 bg-card/40 p-3">
+                        <div className="space-y-2 border-t border-border/50 p-2 pt-2">
+                          {opsFeed.items.slice(0, 6).map((item) => (
+                            <div key={`feed-${item.key}-${item.event_type}`} className="rounded-lg border border-border/60 bg-card/40 p-2.5">
                               <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                                 <div className="min-w-0">
                                   <p className="text-sm font-medium text-foreground">
@@ -1080,8 +1084,8 @@ export default function DashboardOpsPage() {
                       </details>
                     ) : (
                       <div className="space-y-2">
-                        {opsFeed.items.slice(0, 10).map((item) => (
-                          <div key={`feed-${item.key}-${item.event_type}`} className="rounded-lg border border-border/60 bg-card/40 p-3">
+                        {opsFeed.items.slice(0, 6).map((item) => (
+                          <div key={`feed-${item.key}-${item.event_type}`} className="rounded-lg border border-border/60 bg-card/40 p-2.5">
                             <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                               <div className="min-w-0">
                                 <p className="text-sm font-medium text-foreground">
@@ -1105,8 +1109,8 @@ export default function DashboardOpsPage() {
                 )}
 
                 {ledger && (
-                  <div className="rounded-2xl border border-red-500/15 bg-card/40 p-5 shadow-sm ring-1 ring-red-500/10">
-                    <div className="mb-4 flex items-center justify-between">
+                  <div className="rounded-2xl border border-red-500/15 bg-card/40 p-4 shadow-sm ring-1 ring-red-500/10">
+                    <div className="mb-3 flex items-center justify-between">
                       <h2 className="font-serif text-lg font-semibold">Blocker ledger</h2>
                       <Badge className="border-red-500/40 bg-red-500/15 text-red-300">
                         {ledger.total} active blockers
@@ -1118,8 +1122,8 @@ export default function DashboardOpsPage() {
                         No blockers detected for this workspace.
                       </div>
                     ) : (
-                      <div className="grid gap-4 sm:grid-cols-2">
-                        <div className="space-y-2 rounded-xl border border-border bg-card/40 p-3">
+                      <div className="grid gap-3 sm:grid-cols-2">
+                        <div className="space-y-2 rounded-xl border border-border bg-card/40 p-2.5">
                           <h3 className="text-sm font-semibold">Needs owner</h3>
                           {(ledger.needs_owner || []).length === 0 ? (
                             <p className="text-sm text-muted-foreground">No unassigned blockers.</p>
@@ -1141,7 +1145,7 @@ export default function DashboardOpsPage() {
                             ))
                           )}
                         </div>
-                        <div className="space-y-2 rounded-xl border border-border bg-card/40 p-3">
+                        <div className="space-y-2 rounded-xl border border-border bg-card/40 p-2.5">
                           <h3 className="text-sm font-semibold">Assigned blockers</h3>
                           {(ledger.assigned || []).length === 0 ? (
                             <p className="text-sm text-muted-foreground">No assigned blockers.</p>
