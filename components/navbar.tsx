@@ -105,7 +105,15 @@ export function Navbar() {
           </div>
         </div>
         {isLoggedIn ? (
-          <DropdownMenu.Root>
+          <div className="flex items-center gap-2">
+            <Link
+              href="/ops"
+              className="hidden sm:inline-flex items-center gap-1.5 rounded-full bg-cyan-500/15 px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-cyan-200 ring-1 ring-cyan-500/35 transition-colors hover:bg-cyan-500/25"
+            >
+              <Workflow className="h-3.5 w-3.5" />
+              Ops
+            </Link>
+            <DropdownMenu.Root>
             <DropdownMenu.Trigger asChild>
               <button
                 className="rounded-full focus:outline-none focus:ring-2 focus:ring-accent/50 focus:ring-offset-2 focus:ring-offset-background"
@@ -170,6 +178,7 @@ export function Navbar() {
               </DropdownMenu.Content>
             </DropdownMenu.Portal>
           </DropdownMenu.Root>
+          </div>
         ) : (
           <div className="flex items-center gap-2">
             <Link href="/login">

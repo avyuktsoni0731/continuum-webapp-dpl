@@ -1,12 +1,8 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { withAuth } from "next-auth/middleware";
+import { getToken } from "next-auth/jwt";
 
-const authMiddleware = withAuth({
-  pages: { signIn: "/login" },
-});
-
-export default function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const host = request.headers.get("host") || "";
   const hostname = host.split(":")[0].toLowerCase();
   const path = request.nextUrl.pathname;
@@ -28,7 +24,19 @@ export default function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  return authMiddleware(request);
+  const token = await getToken({
+    req: request,
+    secret: process.env.NEXTAUTH_SECRET,
+  });
+
+  if (!token) {
+    const loginUrl = new URL("/login", request.url);
+    const callback = `${path}${request.nextUrl.search}`;
+    loginUrl.searchParams.set("callbackUrl", callback);
+    return NextResponse.redirect(loginUrl);
+  }
+
+  return NextResponse.next();
 }
 
 export const config = {
