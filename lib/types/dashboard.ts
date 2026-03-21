@@ -167,6 +167,16 @@ export interface UnifiedOpsResponse {
   };
 }
 
+export interface UnifiedOpsBriefResponse {
+  name: string;
+  workspace_id: string;
+  integration: "all" | "jira" | "github" | string;
+  repo?: string | null;
+  generated_at: string;
+  text: string;
+  refresh_remaining: number;
+}
+
 export interface GithubOrg {
   login: string;
   name: string;

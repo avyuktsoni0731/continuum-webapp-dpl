@@ -17,6 +17,7 @@ import type {
   GithubReposResponse,
   IssueHealthResponse,
   OpsFeedResponse,
+  UnifiedOpsBriefResponse,
   UnifiedOpsResponse,
 } from "@/lib/types/dashboard";
 import { useEffect } from "react";
@@ -149,13 +150,15 @@ export default function DashboardOpsPage() {
   const [selectedOrg, setSelectedOrg] = useState("");
   const [selectedRepo, setSelectedRepo] = useState("");
   const [repoSaving, setRepoSaving] = useState(false);
+  const [opsBrief, setOpsBrief] = useState<UnifiedOpsBriefResponse | null>(null);
+  const [briefRefreshing, setBriefRefreshing] = useState(false);
 
   const loadData = async (targetWorkspaceId: string) => {
     if (status !== "authenticated" || !session?.accessToken || !targetWorkspaceId) return;
     setLoading(true);
     setError(null);
     try {
-      const [h, l, feed, gh, teamRes, unified, ghCfg, ghOrgs] = await Promise.all([
+      const [h, l, feed, gh, teamRes, unified, ghCfg, ghOrgs, brief] = await Promise.all([
         apiFetch<IssueHealthResponse>(
           `/dashboard/issue-health?workspace_id=${targetWorkspaceId}`,
           {},
@@ -196,6 +199,11 @@ export default function DashboardOpsPage() {
           {},
           session.accessToken
         ),
+        apiFetch<UnifiedOpsBriefResponse>(
+          `/dashboard/unified-ops/brief?workspace_id=${targetWorkspaceId}&integration=${integrationFilter}`,
+          {},
+          session.accessToken
+        ),
       ]);
       setHealth(h);
       setLedger(l);
@@ -204,6 +212,7 @@ export default function DashboardOpsPage() {
       setTeamMembers(teamRes.members || []);
       setUnifiedOps(unified);
       setGithubConfig(ghCfg);
+      setOpsBrief(brief);
       const orgs = ghOrgs.orgs || [];
       setGithubOrgs(orgs);
       const orgFromCfg = (ghCfg.default_repo || "").split("/")[0] || "";
@@ -230,6 +239,7 @@ export default function DashboardOpsPage() {
       setGithubConfig(null);
       setGithubOrgs([]);
       setGithubRepos([]);
+      setOpsBrief(null);
     } finally {
       setLoading(false);
     }
@@ -414,6 +424,24 @@ export default function DashboardOpsPage() {
     }
   };
 
+  const refreshOpsBrief = async () => {
+    if (!workspaceId || !session?.accessToken) return;
+    setBriefRefreshing(true);
+    setError(null);
+    try {
+      const updated = await apiFetch<UnifiedOpsBriefResponse>(
+        `/dashboard/unified-ops/brief/refresh?workspace_id=${workspaceId}&integration=${integrationFilter}`,
+        { method: "POST" },
+        session.accessToken
+      );
+      setOpsBrief(updated);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Failed to refresh brief");
+    } finally {
+      setBriefRefreshing(false);
+    }
+  };
+
   return (
     <section className="pb-8">
       <div className="max-w-5xl space-y-6">
@@ -479,6 +507,28 @@ export default function DashboardOpsPage() {
         {error && (
           <div className="rounded-xl border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">
             {error}
+          </div>
+        )}
+
+        {!loading && (
+          <div className="rounded-xl border border-border bg-card/30 p-4">
+            <div className="mb-2 flex items-center justify-between gap-3">
+              <p className="text-sm font-medium text-foreground">{opsBrief?.name || "Continuum Ops Brief"}</p>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={refreshOpsBrief}
+                disabled={briefRefreshing || (opsBrief?.refresh_remaining ?? 0) <= 0}
+              >
+                {briefRefreshing ? "Refreshing..." : "Refresh"}
+              </Button>
+            </div>
+            <p className="text-sm text-muted-foreground whitespace-pre-wrap">
+              {opsBrief?.text || "Daily AI brief is being prepared."}
+            </p>
+            <p className="mt-2 text-xs text-muted-foreground">
+              Generated: {opsBrief?.generated_at ? new Date(opsBrief.generated_at).toLocaleString() : "—"} | Refreshes left today: {opsBrief?.refresh_remaining ?? 0}
+            </p>
           </div>
         )}
 
