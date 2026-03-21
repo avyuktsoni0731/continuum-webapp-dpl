@@ -92,7 +92,10 @@ export function DocsSidebar() {
     };
 
     return (
-        <aside className="w-64 shrink-0 border-r border-border bg-card/50 p-6 overflow-y-auto">
+        <aside
+            data-lenis-prevent
+            className="w-64 shrink-0 touch-pan-y overflow-y-auto overscroll-y-contain border-r border-border bg-card/50 p-6"
+        >
             <div className="mb-8">
                 <Link
                     href="/docs/introduction"

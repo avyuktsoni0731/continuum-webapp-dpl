@@ -12,6 +12,8 @@ export function SmoothScrollProvider({ children }: { children: ReactNode }) {
       smoothWheel: true,
       wheelMultiplier: 1,
       touchMultiplier: 2,
+      /** Let wheel/touch scroll inside overflow:auto regions before the page (Lenis). */
+      allowNestedScroll: true,
     });
 
     function raf(time: number) {
