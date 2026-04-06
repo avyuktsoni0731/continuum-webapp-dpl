@@ -1,7 +1,5 @@
 "use client";
 
-import { Suspense } from "react";
-import { useSearchParams } from "next/navigation";
 import Script from "next/script";
 import { useCallback, useEffect, useState } from "react";
 
@@ -32,49 +30,45 @@ interface RazorpayInstance {
   open: () => void;
 }
 
-function EvCheckoutContent() {
-  const searchParams = useSearchParams();
+type CheckoutSession = {
+  checkoutId: string;
+  eventId: string | null;
+  bundleId: string | null;
+  eventName: string;
+  amountInr: number;
+  returnUrl: string;
+  userName: string | null;
+  email: string | null;
+};
+
+export default function EvCheckoutPage() {
   const [status, setStatus] = useState<"idle" | "loading" | "processing" | "success" | "failed">("idle");
   const [error, setError] = useState<string | null>(null);
   const [razorpayReady, setRazorpayReady] = useState(false);
+  const [session, setSession] = useState<CheckoutSession | null>(null);
 
-  const eventId = searchParams.get("eventId") ?? "";
-  const bundleId = searchParams.get("bundleId") ?? "";
-  const eventName = searchParams.get("eventName") ?? "";
-  const amount = searchParams.get("amount");
-  const userId = searchParams.get("userId") ?? "";
-  const email = searchParams.get("email") ?? "";
-  const userName = searchParams.get("userName") ?? "";
-  const returnUrl = searchParams.get("returnUrl") ?? "";
-  const teamParam = searchParams.get("team");
-  const additionalInfo = searchParams.get("additionalInfo");
-
-  const isBundle = Boolean(bundleId);
-  const hasEvent = Boolean(eventId && eventName);
-  const isValidLink = (hasEvent || isBundle) && amount && userId && email;
-
-  let team: unknown = null;
-  try {
-    if (teamParam) team = JSON.parse(atob(teamParam));
-  } catch {
-    team = null;
-  }
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/ev/session")
+      .then((r) => r.json().then((d) => ({ ok: r.ok, d })))
+      .then(({ ok, d }) => {
+        if (cancelled) return;
+        if (!ok) throw new Error((d as { error?: string }).error || "Invalid checkout session");
+        setSession(d as CheckoutSession);
+      })
+      .catch((e) => {
+        if (cancelled) return;
+        setError(e instanceof Error ? e.message : "Failed to load checkout session");
+        setStatus("failed");
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const openPayment = useCallback(async () => {
-    if (
-      !eventName ||
-      !amount ||
-      !userId ||
-      !email ||
-      !razorpayReady ||
-      typeof window === "undefined" ||
-      !window.Razorpay
-    ) {
-      setError("Missing parameters or Razorpay not loaded.");
-      return;
-    }
-    if (!isBundle && !eventId) {
-      setError("Missing eventId or bundleId.");
+    if (!session || !razorpayReady || typeof window === "undefined" || !window.Razorpay) {
+      setError("Checkout session missing or Razorpay not loaded.");
       return;
     }
 
@@ -84,15 +78,6 @@ function EvCheckoutContent() {
     try {
       const createRes = await fetch("/api/ev/create-order", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          amount: Number(amount),
-          eventId: eventId || undefined,
-          bundleId: bundleId || undefined,
-          eventName,
-          email,
-          userId,
-        }),
       });
 
       if (!createRes.ok) {
@@ -113,9 +98,9 @@ function EvCheckoutContent() {
         amount: order.amount,
         currency: order.currency || "INR",
         name: "Vercera 5.0",
-        description: `Registration for ${eventName}`,
+        description: `Registration for ${session.eventName}`,
         order_id: order.id,
-        prefill: { name: userName || undefined, email: email || undefined },
+        prefill: { name: session.userName || undefined, email: session.email || undefined },
         theme: { color: "#C1E734" },
         handler: async (response) => {
           try {
@@ -126,20 +111,13 @@ function EvCheckoutContent() {
                 orderId: response.razorpay_order_id,
                 paymentId: response.razorpay_payment_id,
                 signature: response.razorpay_signature,
-                eventId: eventId || undefined,
-                bundleId: bundleId || undefined,
-                eventName,
-                amount: Number(amount),
-                userId,
-                team: team || null,
-                additionalInfo: additionalInfo || null,
               }),
             });
 
             if (verifyRes.ok) {
               setStatus("success");
-              if (returnUrl) {
-                window.location.href = returnUrl;
+              if (session.returnUrl) {
+                window.location.href = session.returnUrl;
               }
             } else {
               const err = await verifyRes.json().catch(() => ({}));
@@ -167,43 +145,20 @@ function EvCheckoutContent() {
       setStatus((s) => (s === "loading" ? "idle" : s));
     }
   }, [
-    eventId,
-    bundleId,
-    eventName,
-    amount,
-    userId,
-    email,
-    userName,
-    returnUrl,
-    team,
-    additionalInfo,
+    session,
     razorpayReady,
-    isBundle,
   ]);
 
   useEffect(() => {
-    if (status === "idle" && razorpayReady && (eventId || bundleId) && amount) {
+    if (status === "idle" && razorpayReady && session) {
       openPayment();
     }
-  }, [status, razorpayReady, eventId, bundleId, amount, openPayment]);
+  }, [status, razorpayReady, session, openPayment]);
 
-  const missing = !isValidLink;
-
-  if (missing) {
+  if (!session && status !== "failed") {
     return (
       <main className="flex min-h-screen flex-col items-center justify-center bg-background p-6">
-        <h1 className="font-serif text-xl font-medium text-foreground">Invalid checkout link</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Missing required parameters. Please start from the event registration page.
-        </p>
-        {returnUrl && (
-          <a
-            href={returnUrl}
-            className="mt-6 text-sm text-accent hover:underline"
-          >
-            Return to site
-          </a>
-        )}
+        <p className="text-muted-foreground">Loading checkout…</p>
       </main>
     );
   }
@@ -222,9 +177,9 @@ function EvCheckoutContent() {
               <p className="mt-2 text-sm text-muted-foreground">
                 Redirecting you back…
               </p>
-              {returnUrl && (
+              {session?.returnUrl && (
                 <a
-                  href={returnUrl}
+                  href={session.returnUrl}
                   className="mt-4 inline-block text-sm text-accent hover:underline"
                 >
                   Click here if not redirected
@@ -245,9 +200,9 @@ function EvCheckoutContent() {
               >
                 Try again
               </button>
-              {returnUrl && (
+              {session?.returnUrl && (
                 <a
-                  href={returnUrl}
+                  href={session.returnUrl}
                   className="mt-4 block text-sm text-accent hover:underline"
                 >
                   Return to site
@@ -265,7 +220,7 @@ function EvCheckoutContent() {
                     : "Loading…"}
               </p>
               <p className="mt-2 text-sm text-muted-foreground">
-                {eventName} · ₹{amount}
+                {session?.eventName} · ₹{session?.amountInr}
               </p>
               {!razorpayReady && (
                 <p className="mt-4 text-xs text-muted-foreground">
@@ -277,21 +232,5 @@ function EvCheckoutContent() {
         </div>
       </main>
     </>
-  );
-}
-
-export default function EvCheckoutPage() {
-  return (
-    <Suspense
-      fallback={
-        <main className="flex min-h-[60vh] flex-col items-center justify-center px-4">
-          <div className="text-center">
-            <p className="text-muted-foreground">Loading checkout…</p>
-          </div>
-        </main>
-      }
-    >
-      <EvCheckoutContent />
-    </Suspense>
   );
 }

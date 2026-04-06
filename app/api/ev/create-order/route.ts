@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import Razorpay from "razorpay";
+import { resolveVerceraCheckoutSession } from "@/lib/ev-checkout-session";
 
 const EV_PROXY_SECRET = process.env.EV_PROXY_SECRET;
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://continuumworks.app";
@@ -44,35 +45,30 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const body = await req.json();
-    const { amount, eventId, bundleId, eventName, email, userId } = body;
-
-    const hasEvent = eventId && eventName;
-    const hasBundle = bundleId && eventName;
-    if (!amount || !email || !userId || (!hasEvent && !hasBundle)) {
-      return NextResponse.json(
-        { error: "Missing required fields (need amount, eventName, email, userId, and either eventId or bundleId)" },
-        { status: 400 }
-      );
+    const checkoutId = req.cookies.get("ev_checkout_id")?.value?.trim();
+    if (!checkoutId) {
+      return NextResponse.json({ error: "Checkout session missing" }, { status: 400 });
     }
+    const session = await resolveVerceraCheckoutSession(checkoutId);
 
-    const amountInPaise = Math.round(Number(amount) * 100);
+    const amountInPaise = Math.round(Number(session.amountInr) * 100);
     const razorpay = new Razorpay({
       key_id: RAZORPAY_KEY_ID,
       key_secret: keySecret,
     });
 
-    const receiptId = bundleId ? `bundle_${bundleId}` : `ev_${eventId}`;
+    const receiptId = session.bundleId ? `bundle_${session.bundleId}` : `ev_${session.eventId}`;
     const order = await razorpay.orders.create({
       amount: amountInPaise,
       currency: "INR",
       receipt: `${receiptId}_${Date.now().toString(36)}`,
       notes: {
-        ...(eventId && { event_id: eventId }),
-        ...(bundleId && { bundle_id: bundleId }),
-        event_name: eventName,
-        user_id: userId,
-        participant_email: email,
+        checkout_id: checkoutId,
+        ...(session.eventId && { event_id: session.eventId }),
+        ...(session.bundleId && { bundle_id: session.bundleId }),
+        event_name: session.eventName,
+        user_id: session.userId,
+        participant_email: session.email ?? "",
       },
     });
 

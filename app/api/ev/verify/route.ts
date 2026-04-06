@@ -1,10 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
+import Razorpay from "razorpay";
+import { resolveVerceraCheckoutSession } from "@/lib/ev-checkout-session";
 
 const EV_PROXY_SECRET = process.env.EV_PROXY_SECRET;
 const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL || "https://continuumworks.app";
 const RAZORPAY_KEY_SECRET = process.env.RAZORPAY_KEY_SECRET;
+const RAZORPAY_KEY_ID = process.env.RAZORPAY_KEY_ID;
 const VERCERA_CALLBACK_URL = process.env.VERCERA_CALLBACK_URL;
 const VERCERA_CALLBACK_SECRET = process.env.VERCERA_CALLBACK_SECRET;
 
@@ -48,39 +51,19 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const {
-      orderId,
-      paymentId,
-      signature,
-      eventId,
-      bundleId,
-      eventName,
-      amount,
-      userId,
-      team,
-      teamName,
-      memberEmails,
-      additionalInfo,
-    } = body;
-
-    const hasEvent = eventId && eventName;
-    const hasBundle = bundleId && eventName;
-    if (
-      !orderId ||
-      !paymentId ||
-      !signature ||
-      amount == null ||
-      !userId ||
-      (!hasEvent && !hasBundle)
-    ) {
+    const { orderId, paymentId, signature } = body;
+    if (!orderId || !paymentId || !signature) {
       return NextResponse.json(
-        {
-          error:
-            "Missing required fields (need orderId, paymentId, signature, amount, userId, and either eventId+eventName or bundleId+eventName)",
-        },
+        { error: "Missing required fields (orderId, paymentId, signature)" },
         { status: 400 },
       );
     }
+    const checkoutId = req.cookies.get("ev_checkout_id")?.value?.trim();
+    if (!checkoutId) {
+      return NextResponse.json({ error: "Checkout session missing" }, { status: 400 });
+    }
+    const session = await resolveVerceraCheckoutSession(checkoutId);
+    const expectedAmountPaise = Math.round(Number(session.amountInr) * 100);
 
     const expectedSignature = crypto
       .createHmac("sha256", RAZORPAY_KEY_SECRET)
@@ -94,6 +77,24 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    if (!RAZORPAY_KEY_ID) {
+      return NextResponse.json({ error: "Payment not configured" }, { status: 500 });
+    }
+    const razorpay = new Razorpay({ key_id: RAZORPAY_KEY_ID, key_secret: RAZORPAY_KEY_SECRET });
+    const [order, payment] = await Promise.all([
+      razorpay.orders.fetch(orderId),
+      razorpay.payments.fetch(paymentId),
+    ]);
+    if (!order || !payment || payment.order_id !== orderId) {
+      return NextResponse.json({ error: "Invalid order/payment linkage" }, { status: 400 });
+    }
+    if (order.amount !== expectedAmountPaise || payment.amount !== expectedAmountPaise) {
+      return NextResponse.json({ error: "Amount mismatch" }, { status: 400 });
+    }
+    if (payment.status !== "captured" && payment.status !== "authorized") {
+      return NextResponse.json({ error: "Payment not successful" }, { status: 400 });
+    }
+
     if (!VERCERA_CALLBACK_URL || !VERCERA_CALLBACK_SECRET) {
       return NextResponse.json(
         { error: "Callback not configured" },
@@ -104,15 +105,16 @@ export async function POST(req: NextRequest) {
     const callbackPayload = {
       orderId,
       paymentId,
-      ...(eventId && { eventId }),
-      ...(bundleId && { bundleId }),
-      eventName,
-      amount: Number(amount),
-      userId,
-      team: team || null,
-      teamName: teamName || null,
-      memberEmails: memberEmails || null,
-      additionalInfo: additionalInfo || null,
+      checkoutId,
+      ...(session.eventId && { eventId: session.eventId }),
+      ...(session.bundleId && { bundleId: session.bundleId }),
+      eventName: session.eventName,
+      amount: Number(session.amountInr),
+      userId: session.userId,
+      team: null,
+      teamName: null,
+      memberEmails: null,
+      additionalInfo: session.additionalInfo || null,
     };
 
     const callbackRes = await fetch(VERCERA_CALLBACK_URL, {
