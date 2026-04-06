@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 
+/**
+ * Accepts POST from Vercera with hidden checkoutId (form post).
+ * Sets HttpOnly cookie and redirects to the UI page at /ev/checkout.
+ * Lives under /api so it does not conflict with app/ev/checkout/page.tsx.
+ */
 export async function POST(request: NextRequest) {
   const contentType = request.headers.get('content-type') || ''
   let checkoutId = ''
@@ -20,11 +25,10 @@ export async function POST(request: NextRequest) {
   const response = NextResponse.redirect(redirectUrl, { status: 303 })
   response.cookies.set('ev_checkout_id', checkoutId, {
     httpOnly: true,
-    secure: true,
+    secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
     path: '/',
     maxAge: 15 * 60,
   })
   return response
 }
-
